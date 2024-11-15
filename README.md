@@ -1,6 +1,6 @@
 ## Getting Started
 
-Follow these steps to get the project up and running on your local machine.
+Follow these steps to get the project up and running on your local machine:
 
 ### Installation
 
