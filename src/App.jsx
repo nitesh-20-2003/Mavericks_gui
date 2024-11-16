@@ -1,5 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { HomeLayout ,Error,Datasets,Stats,Landing,About} from "./pages";
+import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction} from "./pages";
 const router=createBrowserRouter([
   {
     path:'/',
@@ -11,15 +11,15 @@ const router=createBrowserRouter([
         element:<Landing />
       },
      { path:"stats",
-      element:<Stats />,
+      element:<UnderConstruction />,
     },
     {
       path:"Datasets",
-      element:<Datasets />,
+      element:<UnderConstruction />,
     },
  {
   path:"about",
-  element:<About />
+  element:<UnderConstruction />
  }
     ]
   }

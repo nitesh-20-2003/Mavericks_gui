@@ -2,7 +2,9 @@ import React from 'react'
 import {UnderConstruction} from './index'
  const Stats = () => {
   return (
-    <UnderConstruction />
+   <div>
+    Stats
+   </div>
   )
 }
  export default Stats;

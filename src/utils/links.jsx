@@ -12,6 +12,11 @@ const links = [
     icon: <IoHome />,
   },
   {
+    text:"About Us",
+    path:"about",
+    icon:<MdOutlineRoomPreferences />,
+  },
+  {
     text: "Datasets",
     path: "Datasets",
     icon: <MdDatasetLinked />,

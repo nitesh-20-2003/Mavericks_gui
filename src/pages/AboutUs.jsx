@@ -3,7 +3,7 @@ import UnderConstruction from './UnderConstruction'
 
 const AboutUs = () => {
   return (
-    <UnderConstruction />
+    <div>about us</div>
   )
 }
 
