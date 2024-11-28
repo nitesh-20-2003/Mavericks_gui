@@ -12,9 +12,9 @@ const links = [
     icon: <IoHome />,
   },
   {
-    text:"About Us",
-    path:"about",
-    icon:<MdOutlineRoomPreferences />,
+    text: "About Us",
+    path: "about",
+    icon: <MdOutlineRoomPreferences />,
   },
   {
     text: "Datasets",
@@ -33,7 +33,7 @@ const links = [
   },
   {
     text: "Your space",
-    path: "your space",
+    path: "your-space",
     icon: <BsPersonWorkspace />,
   },
 ];

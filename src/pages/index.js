@@ -5,3 +5,6 @@ export {default as Datasets} from './Datasets'
 export {default as HomeLayout} from './HomeLayout';
 export {default as Landing} from './Landing'
 export {default as About} from './AboutUs'
+export {default as YourSpace} from './YourSpace'
+import YourSpace from './YourSpace';
+console.log(YourSpace);

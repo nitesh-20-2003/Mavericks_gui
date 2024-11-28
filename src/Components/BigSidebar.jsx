@@ -4,7 +4,7 @@ import { useSelector } from "react-redux"; // Import Redux hook
 
 const BigSidebar = () => {
   const showSidebar = useSelector((state) => state.sidebarState.showSidebar); 
-  console.log(showSidebar)
+  // console.log(showSidebar)
   return (
     <Wrapper>
       <div

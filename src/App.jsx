@@ -1,5 +1,5 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction} from "./pages";
+import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction,YourSpace} from "./pages";
 const router=createBrowserRouter([
   {
     path:'/',
@@ -11,7 +11,7 @@ const router=createBrowserRouter([
         element:<Landing />
       },
      { path:"stats",
-      element:<UnderConstruction />,
+      element:<Stats />,
     },
     {
       path:"Datasets",
@@ -20,7 +20,12 @@ const router=createBrowserRouter([
  {
   path:"about",
   element:<UnderConstruction />
+ },
+ {
+  path:"your-space",
+  element:<YourSpace/>,
  }
+
     ]
   }
 ])
