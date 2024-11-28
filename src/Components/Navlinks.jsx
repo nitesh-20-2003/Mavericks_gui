@@ -1,4 +1,4 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch} from "react-redux";
 import { toggleSidebar } from "../features/SidebarSlice";
 import links from "../utils/links";
 import { NavLink } from "react-router-dom";
