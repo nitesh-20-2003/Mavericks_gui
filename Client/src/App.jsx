@@ -1,5 +1,6 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction} from "./pages";
+import { VideosPage } from "./Components";
 const router=createBrowserRouter([
   {
     path:'/',
@@ -15,7 +16,7 @@ const router=createBrowserRouter([
     },
     {
       path:"Datasets",
-      element:<UnderConstruction />,
+      element:<VideosPage />,
     },
  {
   path:"about",

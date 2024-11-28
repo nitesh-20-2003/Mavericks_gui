@@ -1,9 +1,10 @@
 import React from 'react'
+import { HomeInfo } from '../Components'
 
 const Landing = () => {
   return (
-    <div>Landing..
-      
+    <div>
+      <HomeInfo />
     </div>
   )
 }

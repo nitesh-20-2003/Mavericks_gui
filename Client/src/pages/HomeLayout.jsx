@@ -23,8 +23,6 @@ const HomeLayout = () => {
               <Loading />
             ) : (
               <>
-                {/* ISL-NMF Info Section */}
-                <ISLInfo />
                 {/* Routed Content */}
                 <section className="align-element py-20">
                   <Outlet />
