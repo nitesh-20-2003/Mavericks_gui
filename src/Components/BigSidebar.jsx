@@ -1,10 +1,11 @@
 import Wrapper from "../assets/Wrappers/BigSidebar.js";
 import NavLinks from "./Navlinks.jsx";
-import { useSelector } from "react-redux"; // Import Redux hook
+import { useSelector } from "react-redux"; 
+import Logo from './Logo.jsx';
 
 const BigSidebar = () => {
   const showSidebar = useSelector((state) => state.sidebarState.showSidebar); 
-  // console.log(showSidebar)
+  
   return (
     <Wrapper>
       <div
@@ -14,6 +15,7 @@ const BigSidebar = () => {
       >
         <div className="content">
           <header>
+            <Logo />
           </header>
           <NavLinks isBigSidebar />
         </div>

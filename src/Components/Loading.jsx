@@ -1,7 +1,7 @@
 const Loading = () => {
   return (
-    <div className="h-screen flex items-center justify-center">
-      <span className="loading loading-ring loading-lg"></span>
+    <div className="flex h-screen justify-center items-center">
+      <span className="loading loading-ring  h-50 w-[8rem]"></span>
     </div>
   );
 };

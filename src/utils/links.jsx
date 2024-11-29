@@ -8,7 +8,7 @@ import { IoHome } from "react-icons/io5";
 const links = [
   {
     text: "Home",
-    path: "/",
+    path: ".",
     icon: <IoHome />,
   },
   {

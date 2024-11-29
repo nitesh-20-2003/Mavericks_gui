@@ -2,11 +2,11 @@ import { FaTimes } from "react-icons/fa";
 import Wrapper from "../assets/Wrappers/SmallSidebar";
 import NavLinks from "./Navlinks.jsx"
 import { useSelector, useDispatch } from "react-redux";
-import { toggleSidebar } from "../features/SidebarSlice.js"; // Redux action
-
+import { toggleSidebar } from "../features/SidebarSlice.js"; 
+import Logo from './Logo.jsx';
 const SmallSidebar = () => {
   const dispatch = useDispatch();
-  const showSidebar = useSelector((state) => state.sidebarState.showSidebar); // Get sidebar state from Redux
+  const showSidebar = useSelector((state) => state.sidebarState.showSidebar); 
 
   return (
     <Wrapper>
@@ -19,13 +19,14 @@ const SmallSidebar = () => {
           <button
             type="button"
             className="close-btn"
-            onClick={() => dispatch(toggleSidebar())} // Toggle sidebar visibility
+            onClick={() => dispatch(toggleSidebar())}
           >
             <FaTimes />
           </button>
           <header>
+              <Logo />
           </header>
-          <NavLinks /> {/* Include NavLinks component */}
+          <NavLinks />
         </div>
       </div>
     </Wrapper>
