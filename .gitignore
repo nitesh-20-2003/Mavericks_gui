@@ -1,2 +1,2 @@
-./node_modules
-.it/Client/node_modules
+**/node_modules
+**/.env
