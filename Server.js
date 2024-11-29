@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use(morgan("dev"));
 // test route
 app.get("/api/test", (req, res) => {
-  console.log(req); 
+  
   res.json(`test route`)
 });
 app.use("/api/auth", authRouter);

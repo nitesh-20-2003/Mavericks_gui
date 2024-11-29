@@ -7,12 +7,18 @@ import { BsPersonWorkspace } from "react-icons/bs";
 import { IoHome } from "react-icons/io5";
 import { IoIosBookmarks } from "react-icons/io";
 import { BsWebcamFill } from "react-icons/bs";
-const userId = localStorage.getItem("userId");
+import { VscGitPullRequestCreate } from "react-icons/vsc";
+
 const links = [
   {
     text: "Home",
     path: ".",
     icon: <IoHome />,
+  },
+  {
+    text:"create",
+    path:"create",
+    icon:<VscGitPullRequestCreate />,
   },
   {
     text: "Dictionary",
@@ -37,7 +43,7 @@ const links = [
 
   {
     text: "Profile",
-    path: `/profile/${userId}`,
+    path: `/profile`,
     icon: <ImProfile />,
   },
   {

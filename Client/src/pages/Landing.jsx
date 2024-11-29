@@ -14,7 +14,7 @@ const Landing = () => {
       </nav>
       <div className="container page">
         <div className="info">
-          <h1>
+          <h1 className="">
             <span>Croudsource</span> app
           </h1>
           <p>
