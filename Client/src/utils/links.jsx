@@ -5,6 +5,8 @@ import { ImProfile } from "react-icons/im";
 import { MdOutlineRoomPreferences } from "react-icons/md";
 import { BsPersonWorkspace } from "react-icons/bs";
 import { IoHome } from "react-icons/io5";
+
+const userId = localStorage.getItem("userId");
 const links = [
   {
     text: "Home",
@@ -12,9 +14,9 @@ const links = [
     icon: <IoHome />,
   },
   {
-    text:"About Us",
-    path:"about",
-    icon:<MdOutlineRoomPreferences />,
+    text: "About Us",
+    path: "about",
+    icon: <MdOutlineRoomPreferences />,
   },
   {
     text: "Datasets",
@@ -22,19 +24,20 @@ const links = [
     icon: <MdDatasetLinked />,
   },
   {
-    text: "stats",
+    text: "Stats",
     path: "stats",
     icon: <IoStatsChartSharp />,
   },
   {
-    text: "profile",
-    path: "profile",
+    text: "Profile",
+    path: `/profile/${userId}`, // Dynamically pass userId here
     icon: <ImProfile />,
   },
   {
-    text: "Your space",
+    text: "Your Space",
     path: "your space",
     icon: <BsPersonWorkspace />,
   },
 ];
+
 export default links;

@@ -24,7 +24,7 @@ const HomeLayout = () => {
             ) : (
               <>
                 {/* Routed Content */}
-                <section className="align-element py-20">
+                <section className="align-element">
                   <Outlet />
                 </section>
               </>

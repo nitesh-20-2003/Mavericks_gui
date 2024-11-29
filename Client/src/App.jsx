@@ -1,6 +1,8 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction} from "./pages";
+import { HomeLayout ,Error, Datasets, Stats, Landing, About, UnderConstruction, ProfilePage} from "./pages";
 import { VideosPage } from "./Components";
+
+const userId = localStorage.getItem("userId");
 const router=createBrowserRouter([
   {
     path:'/',
@@ -18,10 +20,14 @@ const router=createBrowserRouter([
       path:"Datasets",
       element:<VideosPage />,
     },
- {
-  path:"about",
-  element:<UnderConstruction />
- }
+    {
+      path:"about",
+      element:<UnderConstruction />
+    },
+    {
+      path: `profile/${userId}`,  // 'userId' is dynamic and will be extracted
+      element: <ProfilePage />,
+    }
     ]
   }
 ])
