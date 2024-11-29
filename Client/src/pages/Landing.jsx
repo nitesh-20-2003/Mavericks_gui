@@ -3,7 +3,7 @@
 import { Link } from "react-router-dom";
 import {Logo } from "../Components";
 import React from 'react'
-<<<<<<< HEAD:src/pages/Landing.jsx
+
 import main from '../assets/images/main.svg'
 import Wrapper from "../assets/Wrappers/LandingPage";
 const Landing = () => {
@@ -37,16 +37,6 @@ const Landing = () => {
       </div>
     </Wrapper>
   );
-=======
-import { HomeInfo } from '../Components'
-
-const Landing = () => {
-  return (
-    <div>
-      <HomeInfo />
-    </div>
-  )
->>>>>>> origin/main:Client/src/pages/Landing.jsx
 }
 
 export default Landing

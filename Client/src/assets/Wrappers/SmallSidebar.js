@@ -67,5 +67,10 @@ const Wrapper = styled.aside`
   .active {
     color: var(--primary-500);
   }
+  .logo{
+    height:120px;
+    width:120px;
+    margin-bottom:-4rem;
+  }
 `;
 export default Wrapper;

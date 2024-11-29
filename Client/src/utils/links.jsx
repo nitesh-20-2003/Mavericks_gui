@@ -30,17 +30,13 @@ const links = [
   },
   {
     text: "Profile",
-    path: `/profile/${userId}`, // Dynamically pass userId here
+    path: `/profile/${userId}`, 
     icon: <ImProfile />,
   },
   {
-<<<<<<< HEAD:src/utils/links.jsx
+
     text: "Your space",
     path: "your-space",
-=======
-    text: "Your Space",
-    path: "your space",
->>>>>>> origin/main:Client/src/utils/links.jsx
     icon: <BsPersonWorkspace />,
   },
 ];
