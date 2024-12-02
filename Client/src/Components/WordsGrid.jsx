@@ -45,7 +45,7 @@ const WordsGrid = () => {
           >
             <figure className="px-4 pt-4">
               <img
-                src={img}
+                src={image}
                 alt={name}
                 className="rounded-xl h-64 md:h-48 w-full object-cover"
               />
