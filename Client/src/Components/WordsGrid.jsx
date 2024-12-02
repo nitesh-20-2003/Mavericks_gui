@@ -12,7 +12,7 @@ const WordsGrid = () => {
        try {
          const response = await customFetch.get("/char/Allcharacters");
          setData(response.data);
-        //  console.log(response.data);
+         console.log(response.data);
        } catch (err) {
          setError(err.message);
        } finally {

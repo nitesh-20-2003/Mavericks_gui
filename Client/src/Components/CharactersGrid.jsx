@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import img from "../../../oneto9/4.jpeg";
 import customFetch from "../utils/customFetch";
 
 const CharactersGrid = () => {
@@ -34,7 +33,7 @@ const CharactersGrid = () => {
   return (
     <div className="w-[90vw] max-w-[1120px] mx-auto">
       <div className="pt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {data?.map((product) => {
+        {data?.slice(0, 3).map((product) => {
           const { name, image, _id } = product;
           return (
             <Link
@@ -44,7 +43,7 @@ const CharactersGrid = () => {
             >
               <figure className="px-4 pt-4">
                 <img
-                  src={img}
+                  src={image}
                   alt={name}
                   className="rounded-xl h-64 md:h-48 w-full object-cover"
                 />

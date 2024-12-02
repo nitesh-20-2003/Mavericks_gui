@@ -23,12 +23,11 @@ import charRouter from './routes/characters.js';
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-
+app.use("/api/oneto9", express.static(path.join(__dirname, "oneto9")));
 
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
-app.use("/static", express.static(path.join(__dirname, "oneto9")));
 app.get("/api/test", (req, res) => {
   res.json("test route");
 });
