@@ -4,36 +4,43 @@ import {
   BadRequestError,
   UnauthenticatedError,
   UnauthorizedError,
-} from "./errors/customErrors.js";
+} from "./errors/customErrors.js"
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
-import * as dotenv from "dotenv";
-import mongoose from "mongoose";
-const app = express();
+import dotenv from "dotenv";
+import connectDB from "./db/connect.js";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 dotenv.config();
-app.use(cors());
-import { authenticateUser } from "./middleware/authMiddleware.js";
-
-// routes
+const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+//  routes
 import authRouter from "./routes/authRouter.js";
+import charRouter from './routes/characters.js';
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
-// middleware
+
+app.use("/oneto9", express.static(path.join(__dirname, "oneto9")));
+
 app.use(express.json());
 app.use(cookieParser());
-app.use(morgan("dev"));
-// test route
+app.use(cors());
 app.get("/api/test", (req, res) => {
-  
-  res.json(`test route`)
+  res.json("test route");
 });
+
 app.use("/api/auth", authRouter);
 
+app.use('/api/char',charRouter);
 app.use("*", (req, res) => {
-  res.status(404).json({ msg: " route does not found" });
+  res.status(404).json({ msg: "Route not found" });
 });
+
+
 app.use((err, req, res, next) => {
   console.log(err);
   if (err instanceof UnauthenticatedError) {
@@ -45,15 +52,16 @@ app.use((err, req, res, next) => {
   if (err instanceof UnauthorizedError) {
     return res.status(err.statusCode).json({ errors: err.message });
   }
-  // Handle other error types
-  res.status(500).json({ msg: "something went wrong" });
+  res.status(500).json({ msg: "Something went wrong" });
 });
 
 const port = process.env.PORT || 5100;
+
+
 (async () => {
   try {
-    mongoose.connect(process.env.MONGO_URL);
-    app.listen(port, console.log(`im listning at port ${port}....`));
+    await connectDB(process.env.MONGO_URL);
+    app.listen(port, () => console.log(`Listening on port ${port}...`));
   } catch (error) {
     console.log(error);
   }

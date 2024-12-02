@@ -1,11 +1,11 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 // elements
-import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction,YourSpace,DashBoardLanding,DashBoardLayout ,Login ,Register} from "./pages";
+import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction,YourSpace,DashBoardLanding,DashBoardLayout ,Login ,Register,Dictionary,Words,DictionaryLanding} from "./pages";
 // actions
 import {action as RegisterAction} from './pages/Register'
 import { action as LoginAction } from "./pages/Login";
-const router=createBrowserRouter([
 
+const router = createBrowserRouter([
   {
     path: "/",
     element: <HomeLayout />,
@@ -17,14 +17,13 @@ const router=createBrowserRouter([
       },
       {
         path: "register",
-        action:RegisterAction,
+        action: RegisterAction,
         element: <Register />,
-        
       },
       {
         path: "login",
         element: <Login />,
-        action:LoginAction,
+        action: LoginAction,
       },
       {
         path: "dashboard",
@@ -33,6 +32,20 @@ const router=createBrowserRouter([
           {
             index: true,
             element: <DashBoardLanding />,
+          },
+          {
+            path: "Dictionary",
+            element: <Dictionary />,
+            children: [
+              {
+                index: true,
+                element:<DictionaryLanding />,
+              },
+              {
+                path:"Words",
+                element:<Words />,
+              }
+            ],
           },
           { path: "stats", element: <Stats /> },
           {

@@ -46,11 +46,7 @@ const links = [
     path: `/profile`,
     icon: <ImProfile />,
   },
-  {
-    text: "Your space",
-    path: "your-space",
-    icon: <BsPersonWorkspace />,
-  },
+  
 ];
 
 export default links;

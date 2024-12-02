@@ -4,7 +4,7 @@ const UploadVideo = () => {
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState(""); // New state for category (expression)
+  const [category, setCategory] = useState(""); 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ const UploadVideo = () => {
     formData.append("file", file);
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("category", category); // Include category in the form data
+    formData.append("category", category); 
 
     setLoading(true);
     setMessage("");
@@ -29,7 +29,7 @@ const UploadVideo = () => {
         body: formData,
       });
 
-      const data = await response.json();
+      const dazta = await response.json();
       if (response.ok) {
         setMessage(data.message);
         console.log("Uploaded Video:", data.video);

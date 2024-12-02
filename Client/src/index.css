@@ -132,7 +132,7 @@ h4 {
 h5 {
   font-size: clamp(1rem, 2vw, 2rem);
 }
- */
+*/
 
 .text {
   margin-bottom: 1.5rem;
@@ -175,18 +175,18 @@ ul {
 .btn:hover {
   background: var(--primary-700);
   box-shadow: var(--shadow-3);
-}
-.btn-hipster {
-  color: var(--primary-500);
+  }
+  .btn-hipster {
+    color: var(--primary-500);
   background: var(--primary-200);
-}
-.btn-hipster:hover {
+  }
+  .btn-hipster:hover {
   color: var(--primary-200);
   background: var(--primary-700);
 }
 .btn-block {
   width: 100%;
-}
+  }
 button:disabled {
   cursor: wait;
 }
@@ -303,8 +303,9 @@ button:disabled {
 }
 .logo {
   display: flex;
-    align-items: center;
-    width: 200px;
-    height: 200px;
+  align-items: center;
+  width: 200px;
+  height: 200px;
 }
+
 
