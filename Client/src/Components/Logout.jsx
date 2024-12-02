@@ -1,8 +1,8 @@
 import React, { useState } from "react";
+import User from "../assets/images/User.svg"
 
 const Logout = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
   };
@@ -11,9 +11,9 @@ const Logout = () => {
     <div className="relative inline-block text-center">
       {/* Avatar Button */}
       <div onClick={toggleDropdown} className="cursor-pointer avatar">
-        <div className="ring-secondary ring-offset-base-100 rounded-full ring ring-offset-2 h-[50px] w-[50px]">
+        <div className="ring-neutral ring-offset-base-50 rounded-full ring ring-offset-[0.01rem] h-[50px] w-[50px]">
           <img
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+            src={User}
             alt="Avatar"
           />
         </div>
