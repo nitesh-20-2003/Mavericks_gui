@@ -76,71 +76,63 @@ const VideosPage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
-      <h1 className="text-4xl font-bold text-center text-blue-600 mb-10">
-        Videos
+    <div className="min-h-screen bg-gradient-to-br from-indigo-300 via-purple-200 to-pink-300 py-10 px-4">
+      <h1 className="text-5xl font-extrabold text-center text-white mb-12 drop-shadow-xl animate-pulse">
+        Dataset
       </h1>
 
       {/* Navbar for Category Filter */}
-      <nav
-        style={{
-          marginBottom: "30px",
-          width: "100%",
-          textAlign: "center",
-        }}
-      >
-        <ul
-          style={{
-            listStyle: "none",
-            display: "flex",
-            justifyContent: "center",
-            padding: 0,
-            margin: 0,
-            backgroundColor: "#2c3e50",
-            borderRadius: "30px",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            flexWrap: "wrap",
-          }}
-        >
+      <nav className="mb-12">
+        <ul className="flex justify-center gap-4 flex-wrap p-4 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-400 shadow-lg">
           {categories.map((category) => (
             <li
               key={category}
               onClick={() => setSelectedCategory(category)}
-              style={{
-                padding: "12px 20px",
-                margin: "0 10px",
-                backgroundColor:
-                  selectedCategory === category ? "#1abc9c" : "transparent",
-                color: selectedCategory === category ? "#fff" : "#ecf0f1",
-                fontSize: "16px",
-                fontWeight: "500",
-                borderRadius: "20px",
-                cursor: "pointer",
-                transition: "all 0.3s ease-in-out",
-              }}
+              className={`px-6 py-3 text-white font-medium rounded-full cursor-pointer transition-all duration-300 relative ${
+                selectedCategory === category
+                  ? "bg-gradient-to-r from-blue-500 to-green-400 scale-110 shadow-lg"
+                  : "hover:text-black hover:scale-105"
+              }`}
             >
               {category.charAt(0).toUpperCase() + category.slice(1)}
+              <span
+                className={`absolute left-0 bottom-0 w-full h-1 bg-white transform transition-all duration-300 ${
+                  selectedCategory === category ? "scale-100" : "scale-0"
+                }`}
+              ></span>
             </li>
           ))}
         </ul>
       </nav>
 
       {/* Loading and Error States */}
-      {loading && <p className="text-center text-lg">Loading videos...</p>}
-      {error && <p className="text-center text-lg text-red-500">{error}</p>}
+      {loading && (
+        <p className="text-center text-xl font-medium text-gray-700 animate-bounce">
+          Loading videos...
+        </p>
+      )}
+      {error && (
+        <p className="text-center text-lg text-red-600 font-semibold">
+          {error}
+        </p>
+      )}
 
       {/* Videos Grid */}
       {!loading && !error && (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filterVideosByCategory(selectedCategory).map((video) => (
             <div
               key={video._id}
-              className="bg-white p-4 rounded-lg shadow-md transition-transform transform hover:scale-105 flex flex-col items-center justify-between"
+              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:rotate-1 hover:scale-105 flex flex-col items-center"
             >
-              <h3 className="text-xl font-semibold mb-2 text-center">{video.title}</h3>
-              <p className="text-gray-600 mb-4 text-center">{video.description}</p>
+              <h3 className="text-xl font-bold text-center text-gray-800 mb-2">
+                {video.title}
+              </h3>
+              <p className="text-gray-600 mb-4 text-sm text-center">
+                {video.description}
+              </p>
               <video
-                className="w-full h-48 object-cover rounded-lg mb-4"
+                className="w-full h-40 object-cover rounded-lg mb-4 shadow-md hover:shadow-lg transition-transform transform hover:scale-110"
                 controls
                 src={video.url}
               >
@@ -148,9 +140,10 @@ const VideosPage = () => {
               </video>
               <button
                 onClick={() =>
-                  window.confirm("Delete this video?") && deleteVideo(video._id)
+                  window.confirm("Are you sure you want to delete this video?") &&
+                  deleteVideo(video._id)
                 }
-                className="w-28 mx-auto bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-all"
+                className="w-full bg-gradient-to-r from-red-400 to-pink-500 text-white py-2 rounded-lg hover:from-red-500 hover:to-pink-600 transition-all shadow-md"
               >
                 Delete
               </button>
