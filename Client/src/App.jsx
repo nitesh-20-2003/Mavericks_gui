@@ -1,6 +1,6 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 // elements
-import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction,YourSpace,DashBoardLanding,DashBoardLayout ,Login ,Register,Dictionary,Words,DictionaryLanding,Characters,Nmf} from "./pages";
+import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction,YourSpace,DashBoardLanding,DashBoardLayout ,Login ,Register,Dictionary,Words,DictionaryLanding,Characters,Nmf,Profile} from "./pages";
 // actions
 import {action as RegisterAction} from './pages/Register'
 import { action as LoginAction } from "./pages/Login";
@@ -41,6 +41,10 @@ const router = createBrowserRouter([
               {
                 index: true,
                 element:<DictionaryLanding />,
+              },
+              {
+                path:"Profie",
+                element:<Profile />
               },
               {
                 path:"Words",

@@ -16,3 +16,4 @@ export {default as Words} from './Words';
 export {default as DictionaryLanding} from './DictionaryLanding';
 export {default as Characters} from './Characters'
 export {default as Nmf} from './Nmf';
+export {default as Profile} from './Profile'
