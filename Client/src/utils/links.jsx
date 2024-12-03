@@ -37,7 +37,7 @@ const links = [
     icon: <MdOutlineRoomPreferences />,
   },
   {
-    text: "Datasets",
+    text: "Dataset",
     path: "Datasets",
     icon: <MdDatasetLinked />,
   },
