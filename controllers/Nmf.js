@@ -10,7 +10,7 @@ export const Allexpressions = async (req, res) => {
     //  const skip = (page - 1) * limit;
 
     //  const jobs = await Dic.find({})
-    //    .skip(skip)
+    //    .skip(skip).
     //    .limit(limit);
 
     //  const totalJobs = await Dic.countDocuments({});
