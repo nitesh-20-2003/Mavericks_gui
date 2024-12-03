@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
+import mongoose from "mongoose";
 
-// Helper function to generate random descriptions
 const generateRandomDescription = () => {
   const descriptions = [
     "This is a beautiful image captured in nature.",
@@ -21,7 +21,9 @@ const generateRandomDescription = () => {
 
 export const getImages = (req, res) => {
   const imageFiles = [];
-  const imageDirectory = path.join(process.cwd(), "oneto9");
+
+
+  const imageDirectory = path.join(process.cwd(), "public/images");
 
   try {
     const files = fs.readdirSync(imageDirectory);
@@ -30,17 +32,13 @@ export const getImages = (req, res) => {
       const filePath = path.join(imageDirectory, file);
       const extname = path.extname(file).toLowerCase();
 
-      if (
-        extname === ".jpg" ||
-        extname === ".jpeg" ||
-        extname === ".png" ||
-        extname === ".gif"
-      ) {
-        const name = file.split(".")[0];
+      if (extname === ".jpg" || extname === ".jpeg") {
+        const name = file.split(".")[0]; 
         const imageObject = {
           name,
           description: generateRandomDescription(),
-          image: `/oneto9/${file}`,
+        
+          image: `/public/images/${file}`,
         };
 
         imageFiles.push(imageObject);

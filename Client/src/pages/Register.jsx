@@ -11,7 +11,8 @@ export const action = async ({ request }) => {
     toast.success("Registration successful");
     return redirect("/login");
   } catch (error) {
-    toast.error(error?.response?.data?.msg);
+    console.log(error)
+    toast.error("Invalid credintials");
 
     return error;
   }

@@ -10,25 +10,17 @@ const VideosPage = () => {
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/videos");
+      const response = await fetch("http://localhost:5100/api/videos");
       if (!response.ok) {
         throw new Error(`Failed to fetch videos: ${response.statusText}`);
       }
 
       const fetchedVideos = await response.json();
-      const cachedVideos = localStorage.getItem("videos");
-      let parsedCachedVideos = [];
-
-      if (cachedVideos) {
-        parsedCachedVideos = JSON.parse(cachedVideos);
-        if (!Array.isArray(parsedCachedVideos)) {
-          parsedCachedVideos = [];
-        }
-      }
+      const cachedVideos = JSON.parse(localStorage.getItem("videos") || "[]");
 
       const allVideos = [
         ...fetchedVideos,
-        ...parsedCachedVideos.filter(
+        ...cachedVideos.filter(
           (cachedVideo) =>
             !fetchedVideos.some(
               (fetchedVideo) => fetchedVideo._id === cachedVideo._id
@@ -53,12 +45,12 @@ const VideosPage = () => {
     localStorage.setItem("videos", JSON.stringify(updatedVideos));
 
     try {
-      const response = await fetch(`http://localhost:5000/api/videos/${videoId}`, {
+      const response = await fetch(`http://localhost:5100/api/videos/${videoId}`, {
         method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error(`Failed to delete video: ${response.statusText}`);
+        throw new Error(`delete video: ${response.statusText}`);
       }
     } catch (err) {
       console.error("Error deleting video:", err);
@@ -84,23 +76,19 @@ const VideosPage = () => {
   }, []);
 
   return (
-    <div
-      className="center"
-      style={{
-        width: "95vw",
-        minHeight: "100vh",
-        margin: 0,
-        paddingLeft: 40,
-        boxSizing: "border-box",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-      }}
-    >
-      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Videos</h1>
+    <div className="min-h-screen bg-gray-100 py-10 px-4">
+      <h1 className="text-4xl font-bold text-center text-blue-600 mb-10">
+        Videos
+      </h1>
 
       {/* Navbar for Category Filter */}
-      <nav style={{ marginBottom: "30px", width: "100%", textAlign: "center" }}>
+      <nav
+        style={{
+          marginBottom: "30px",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
         <ul
           style={{
             listStyle: "none",
@@ -111,6 +99,7 @@ const VideosPage = () => {
             backgroundColor: "#2c3e50",
             borderRadius: "30px",
             boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+            flexWrap: "wrap",
           }}
         >
           {categories.map((category) => (
@@ -129,11 +118,6 @@ const VideosPage = () => {
                 cursor: "pointer",
                 transition: "all 0.3s ease-in-out",
               }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = "#16a085")}
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor =
-                  selectedCategory === category ? "#1abc9c" : "transparent")
-              }
             >
               {category.charAt(0).toUpperCase() + category.slice(1)}
             </li>
@@ -141,99 +125,32 @@ const VideosPage = () => {
         </ul>
       </nav>
 
-      {/* Loading State */}
-      {loading && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <h2>Loading videos...</h2>
-        </div>
-      )}
+      {/* Loading and Error States */}
+      {loading && <p className="text-center text-lg">Loading videos...</p>}
+      {error && <p className="text-center text-lg text-red-500">{error}</p>}
 
-      {/* Error State */}
-      {error && (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "100vh",
-          }}
-        >
-          <h2 style={{ color: "red" }}>Error: {error}</h2>
-        </div>
-      )}
-
-      {/* Video Grid */}
+      {/* Videos Grid */}
       {!loading && !error && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(3, 1fr)",
-            gap: "20px",
-            width: "100%",
-          }}
-        >
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {filterVideosByCategory(selectedCategory).map((video) => (
             <div
               key={video._id}
-              style={{
-                border: "1px solid #ccc",
-                borderRadius: "10px",
-                padding: "10px",
-                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                textAlign: "center",
-              }}
+              className="bg-white p-4 rounded-lg shadow-md transition-transform transform hover:scale-105 flex flex-col items-center justify-between"
             >
-              <h3 style={{ marginBottom: "10px" }}>{video.title}</h3>
-              <p style={{ marginBottom: "10px", color: "#555" }}>
-                {video.description}
-              </p>
+              <h3 className="text-xl font-semibold mb-2 text-center">{video.title}</h3>
+              <p className="text-gray-600 mb-4 text-center">{video.description}</p>
               <video
-                width="100%"
-                style={{
-                  height: "300px", // Fixed smaller height for videos
-                  objectFit: "cover",
-                  borderRadius: "5px",
-                }}
+                className="w-full h-48 object-cover rounded-lg mb-4"
                 controls
+                src={video.url}
               >
-                <source src={video.url} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
               <button
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      "Are you sure you want to delete this video?"
-                    )
-                  ) {
-                    deleteVideo(video._id);
-                  }
-                }}
-                style={{
-                  marginTop: "10px",
-                  padding: "8px 16px",
-                  backgroundColor: "#ff4747",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  fontWeight: "bold",
-                  fontSize: "14px",
-                  transition: "background-color 0.3s ease",
-                }}
-                onMouseEnter={(e) =>
-                  (e.target.style.backgroundColor = "#ff2a2a")
+                onClick={() =>
+                  window.confirm("Delete this video?") && deleteVideo(video._id)
                 }
-                onMouseLeave={(e) =>
-                  (e.target.style.backgroundColor = "#ff4747")
-                }
+                className="w-28 mx-auto bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition-all"
               >
                 Delete
               </button>

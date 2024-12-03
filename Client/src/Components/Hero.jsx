@@ -1,9 +1,8 @@
-
-import hero1 from '../../../oneto9/0.jpeg';
-import hero2 from "../../../oneto9/1.jpeg";
-import hero3 from "../../../oneto9/6.jpeg";
-import hero4 from "../../../oneto9/4.jpeg";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import hero2 from '../assets/images/5.jpeg';
+import hero1 from "../assets/images/6.jpeg";
+import hero3 from "../assets/images/f.jpeg";
+import hero4 from "../assets/images/g.jpeg";
 const carouselImages = [hero1, hero2, hero3, hero4];
 
 const Hero = () => {
@@ -18,12 +17,18 @@ const Hero = () => {
           word definitions, meanings, and linguistic insights to enhance your
           vocabulary and understanding. Whether you're a student, a writer, or
           just someone with a love for words, our dictionary is your go-to
-          resource for exploring the beauty and depth of language.<span >
-           <a href="" className='link link-neutral ml-3'>Learn more</a>
-         </span>
+          resource for exploring the beauty and depth of language.
+          <span>
+            <a href="" className="link link-neutral ml-3">
+              Learn more
+            </a>
+          </span>
         </p>
         <div className="mt-10 capitalize ">
-          <Link to="/characters" className="btn btn-outline btn-secondary ">
+          <Link
+            to="/dashboard/dictionary/Characters"
+            className="btn btn-outline btn-secondary "
+          >
             characters
           </Link>
           <Link
@@ -31,6 +36,12 @@ const Hero = () => {
             className="btn btn-outline btn-secondary ml-6 "
           >
             words
+          </Link>
+          <Link
+            to="/dashboard/dictionary/Nmf"
+            className="btn btn-outline btn-secondary ml-6 "
+          >
+            Non-manual
           </Link>
         </div>
       </div>

@@ -3,16 +3,19 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
 import Dic from './models/DicModel.js';
+import Nmf from './models/Nmf.js'
 try {
   await mongoose.connect(process.env.MONGO_URL);
   const jsonalphabet = JSON.parse(
-    await readFile(new URL("./utils/characters.json", import.meta.url))
+    await readFile(new URL("./utils/Nmf.json", import.meta.url))
   );
   const alphabets = jsonalphabet.map((characters) => {
     return { ...characters};
   });
-  await Dic.deleteMany({});
-  await Dic.create(alphabets);
+  // await Dic.deleteMany({});
+  // await Dic.create(alphabets);
+  await Nmf.deleteMany({});
+  await Nmf.create(alphabets);
   console.log("Success!!!");
   process.exit(0);
 } catch (error) {

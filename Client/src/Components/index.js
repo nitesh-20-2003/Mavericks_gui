@@ -23,3 +23,5 @@ export {default as Kbd} from './kbd';
 export {default as WordsContainer} from'./WordsContainer';
 export {default as WordsGrid} from './WordsGrid';
 export {default as WordsList} from './WordsList';
+export {default as NmfHeaders} from './NmfHeaders';
+export {default as NmfGrid} from './NmfGrid'

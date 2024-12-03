@@ -1,7 +1,7 @@
 import { Link, useLoaderData } from "react-router-dom";
 import { useState, useEffect } from "react";
 import customFetch from "../utils/customFetch";
-import img from "../../../oneto9/2.jpeg";
+
 
 const ProductsList = () => {
    const [data, setData] = useState(null);
@@ -12,7 +12,7 @@ const ProductsList = () => {
      const fetchData = async () => {
        try {
          const response = await customFetch.get("/char/Allcharacters");
-         setData(response.data);
+         setData(response.data.data);
          console.log(response.data);
        } catch (err) {
          setError(err.message);

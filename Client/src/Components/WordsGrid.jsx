@@ -1,7 +1,6 @@
 import { Link, useLoaderData } from "react-router-dom";
 import { useState,useEffect } from "react";
 import customFetch from "../utils/customFetch";
-import img from '../../../oneto9/2.jpeg';
 const WordsGrid = () => {
    const [data, setData] = useState(null);
    const [loading, setLoading] = useState(true);
@@ -11,8 +10,8 @@ const WordsGrid = () => {
      const fetchData = async () => {
        try {
          const response = await customFetch.get("/char/Allcharacters");
-         setData(response.data);
-         console.log(response.data);
+         setData(response.data.data);
+         console.log(response.data.data);
        } catch (err) {
          setError(err.message);
        } finally {

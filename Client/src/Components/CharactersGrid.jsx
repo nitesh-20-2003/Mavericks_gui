@@ -11,7 +11,8 @@ const CharactersGrid = () => {
     const fetchData = async () => {
       try {
         const response = await customFetch.get("/char/Allcharacters");
-        setData(response.data);
+        setData(response.data.data);
+        console.log(response);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -33,7 +34,7 @@ const CharactersGrid = () => {
   return (
     <div className="w-[90vw] max-w-[1120px] mx-auto">
       <div className="pt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {data?.slice(0, 3).map((product) => {
+        {data?.slice(0,3).map((product) => {
           const { name, image, _id } = product;
           return (
             <Link

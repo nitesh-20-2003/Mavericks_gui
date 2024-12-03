@@ -1,9 +1,10 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 // elements
-import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction,YourSpace,DashBoardLanding,DashBoardLayout ,Login ,Register,Dictionary,Words,DictionaryLanding} from "./pages";
+import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction,YourSpace,DashBoardLanding,DashBoardLayout ,Login ,Register,Dictionary,Words,DictionaryLanding,Characters,Nmf} from "./pages";
 // actions
 import {action as RegisterAction} from './pages/Register'
 import { action as LoginAction } from "./pages/Login";
+import { VideosPage, UploadVideo } from "./Components";
 
 const router = createBrowserRouter([
   {
@@ -44,13 +45,25 @@ const router = createBrowserRouter([
               {
                 path:"Words",
                 element:<Words />,
+              },
+              {
+                path:"Characters",
+                element:<Characters />
+              },
+              {
+                path:"Nmf",
+                element:<Nmf />,
               }
             ],
           },
           { path: "stats", element: <Stats /> },
           {
             path: "Datasets",
-            element: <UnderConstruction />,
+            element: <VideosPage />,
+          },
+          {
+            path: "upload",
+            element: <UploadVideo />,
           },
           {
             path: "about",

@@ -8,6 +8,7 @@ import { IoHome } from "react-icons/io5";
 import { IoIosBookmarks } from "react-icons/io";
 import { BsWebcamFill } from "react-icons/bs";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
+import { RiVideoUploadFill } from "react-icons/ri";
 
 const links = [
   {
@@ -16,9 +17,9 @@ const links = [
     icon: <IoHome />,
   },
   {
-    text:"create",
-    path:"create",
-    icon:<VscGitPullRequestCreate />,
+    text:"Upload Video",
+    path:"upload",
+    icon:<RiVideoUploadFill />,
   },
   {
     text: "Dictionary",
