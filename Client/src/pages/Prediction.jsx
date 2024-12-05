@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { BsFillRecordBtnFill } from "react-icons/bs";
 import { AiOutlineStop } from "react-icons/ai";
-import { predictionHeading } from "../Components";
+
 function Prediction() {
   const [isRecording, setIsRecording] = useState(false);
   const [videoBlob, setVideoBlob] = useState(null);
@@ -10,17 +10,21 @@ function Prediction() {
   const [predictedEmotion, setPredictedEmotion] = useState("");
   const [inputString, setInputString] = useState("");
   const [generatedString, setGeneratedString] = useState("");
+  const [nonManualFeatures, setNonManualFeatures] = useState([]);
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const recordedChunks = useRef([]);
+  const [options,setDropdown]=useState(null);
 
   useEffect(() => {
     if (!isCameraInitialized) {
       initializeCamera();
+    
     }
     return () => stopStream();
   }, []);
 
+  // Initialize camera function
   const initializeCamera = () => {
     return navigator.mediaDevices
       .getUserMedia({
@@ -38,6 +42,8 @@ function Prediction() {
       })
       .catch((err) => console.error("Error accessing camera: ", err));
   };
+
+  // Fetch non-manual features from backend
 
   const startRecording = () => {
     if (!videoRef.current?.srcObject) {
@@ -126,26 +132,27 @@ function Prediction() {
       });
       console.log("Generated response:", response.data);
       setGeneratedString(response.data.rewritten_sentence);
+      setDropdown(response.data.non_manual_features);
     } catch (error) {
       console.error("Error generating string:", error);
     }
   };
 
-  // Function to clear the generated string
   const clearGeneratedString = () => {
     setGeneratedString("");
   };
-
+    // console.log(options);
   return (
     <div className="w-[90vw] max-w-[1120px] mx-auto">
       <div className="flex items-center justify-center">
         <h2 className="font-[800] mt-6 mb-[3.5rem] capitalize font-mono text-secondary">
-          Language that evokes Feelings: <span className="text-gray-800">ISL</span>
+          Language that evokes Feelings:{" "}
+          <span className="text-gray-800">ISL</span>
         </h2>
       </div>
 
       <div className="card lg:card-side bg-base-100 shadow-2xl">
-        <figure>
+        <figure className="">
           <video
             ref={videoRef}
             autoPlay
@@ -154,6 +161,15 @@ function Prediction() {
           ></video>
         </figure>
         <div className="card-body">
+          <select className="select select-bordered w-full max-w-xs capitalize font-baloo font-[400] italic ">
+            <option disabled selected className="font-baloo">
+              Non manual features detected
+            </option>
+            {/* <option>Han Solo</option>
+            <option>Greedo</option> */}
+            
+          </select>
+
           <div className="form-control mb-4">
             <label className="label">
               <span className="label-text font-baloo font-bold text-lg">
@@ -196,6 +212,7 @@ function Prediction() {
               placeholder="Generated string based on emotion"
             ></textarea>
           </div>
+
           <div className="card-actions justify-start mt-4">
             <div className="flex items-center space-x-4">
               {!isRecording ? (
@@ -203,20 +220,14 @@ function Prediction() {
                   onClick={startRecording}
                   className="btn btn-outline rounded-full px-6 py-3"
                 >
-                  Rec
-                  <span>
-                    <BsFillRecordBtnFill />
-                  </span>
+                  Rec <BsFillRecordBtnFill />
                 </button>
               ) : (
                 <button
                   onClick={stopRecording}
                   className="btn btn-outline rounded-full px-6 py-3"
                 >
-                  Stop
-                  <span>
-                    <AiOutlineStop />
-                  </span>
+                  Stop <AiOutlineStop />
                 </button>
               )}
               <button
@@ -225,7 +236,6 @@ function Prediction() {
               >
                 Generate
               </button>
-              {/* Add the Clear button */}
               <button
                 onClick={clearGeneratedString}
                 className="btn btn-outline"

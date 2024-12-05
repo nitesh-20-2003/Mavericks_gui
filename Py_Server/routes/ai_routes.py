@@ -26,7 +26,7 @@ def generate_emotion_text():
     # Generate content for the rewritten sentence
     response_1 = model.generate_content(f"Rewrite the sentence: '{sentence}' in the detected emotion: {emotion}")
     response_2 = model.generate_content(
-        f"State and enlist the non-manual features detected to conclude the emotion according to Indian Sign Language in the above case."
+        f"State and enlist the non-manual features detected tin such way: eye distances, eyebrow distance, mouth to nose distance and so on"
     )
 
     rewritten_sentence = response_1.text.strip()
