@@ -1,12 +1,18 @@
 from flask import Flask, jsonify
 from flask_cors import CORS  # Import CORS
+from dotenv import load_dotenv  # Import load_dotenv to read .env file
+import os  # Import os to access environment variables
 from routes.video_routes import video_blueprint
 from routes.ai_routes import ai_blueprint
 
+# Load environment variables from the .env file
+load_dotenv()
+
+# Initialize the Flask application
 app = Flask(__name__)
 
-# Enable CORS for the entire application
-CORS(app)
+# Enable CORS for the entire application (Adjust origin settings for production)
+CORS(app, resources={r"/*": {"origins": "*"}})  # "*" allows all origins, you can specify allowed domains.
 
 # Register the blueprints
 app.register_blueprint(video_blueprint, url_prefix='/video')
@@ -14,6 +20,9 @@ app.register_blueprint(ai_blueprint, url_prefix='/ai')
 
 @app.route('/', methods=['GET'])
 def welcomepage():
+    """
+    Welcome Page for the Flask server.
+    """
     return jsonify({"message": "Welcome to the Flask server for video processing and AI text generation!"})
 
 # 404 Error Handler
@@ -39,6 +48,11 @@ def internal_server_error(error):
     }), 500
 
 if __name__ == '__main__':
-    port = 5000
+    # Read the port from environment variables (useful for deployments)
+    port = int(os.getenv('PORT', 5000))
+
+    # Optional: Print loaded API key for debugging (remove in production)
+    print(f"Google API Key: {os.getenv('GOOGLE_API_KEY')}")
+
     print(f"Flask server is running on http://localhost:{port}")
     app.run(debug=True, host='0.0.0.0', port=port)

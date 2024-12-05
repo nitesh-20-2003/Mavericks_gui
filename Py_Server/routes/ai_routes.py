@@ -1,8 +1,17 @@
 from flask import Blueprint, request, jsonify
 import google.generativeai as genai
+import os  # Import os to access environment variables
+from dotenv import load_dotenv  # Import dotenv to load .env file
 
-# Configure the Generative AI API with your Google API key
-google_api_key = "AIzaSyAXiYmqpp4agwr1O3fMV9LjFpIv2m0li2Y"
+# Load environment variables from the .env file
+load_dotenv()
+
+# Get the API key from environment variables
+google_api_key = os.getenv("GOOGLE_API_KEY")
+
+# Check if the key exists and configure the API
+if not google_api_key:
+    raise ValueError("Google API Key not found. Please set it in the .env file.")
 genai.configure(api_key=google_api_key)
 
 # Initialize the generative AI model
@@ -23,10 +32,13 @@ def generate_emotion_text():
     sentence = data.get('sentence')
     emotion = data.get('emotion')
 
+    if not sentence or not emotion:
+        return jsonify({"error": "Both 'sentence' and 'emotion' fields are required."}), 400
+
     # Generate content for the rewritten sentence
     response_1 = model.generate_content(f"Rewrite the sentence: '{sentence}' in the detected emotion: {emotion}")
     response_2 = model.generate_content(
-        f"State and enlist the non-manual features detected tin such way: eye distances, eyebrow distance, mouth to nose distance and so on"
+        "State and enlist the non-manual features detected like eye distances, eyebrow distance, mouth-to-nose distance, and so on."
     )
 
     rewritten_sentence = response_1.text.strip()
@@ -49,6 +61,9 @@ def translate_sentence():
 
     data = request.get_json()
     language = data.get('language')
+
+    if not language:
+        return jsonify({"error": "The 'language' field is required."}), 400
 
     # Generate content for the translation of the last rewritten sentence
     response_3 = model.generate_content(f"Translate this sentence: '{rewritten_sentence}' into {language}")
