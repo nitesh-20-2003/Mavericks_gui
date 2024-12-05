@@ -45,7 +45,7 @@ const Wrapper = styled.section`
       border: 0.5rem solid var(--dashboard-border);
       box-sizing: border-box;
       top: -1.5rem;
-      left: -1.5rem;
+      left: -1.4rem;
     }
 
     .about-video {

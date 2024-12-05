@@ -10,6 +10,7 @@ import { BsWebcamFill } from "react-icons/bs";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
 import { RiVideoUploadFill } from "react-icons/ri";
 import { SiCoursera } from "react-icons/si";
+import { SiSemanticscholar } from "react-icons/si";
 
 const links = [
   {
@@ -18,9 +19,9 @@ const links = [
     icon: <IoHome />,
   },
   {
-    text:"Upload Video",
-    path:"upload",
-    icon:<RiVideoUploadFill />,
+    text: "Upload Video",
+    path: "upload",
+    icon: <RiVideoUploadFill />,
   },
   {
     text: "Dictionary",
@@ -35,7 +36,7 @@ const links = [
   {
     text: "Courses",
     path: "courses",
-    icon: <SiCoursera />,
+    icon: <SiSemanticscholar />,
   },
   {
     text: "Dataset",
@@ -48,7 +49,6 @@ const links = [
     path: `/profile`,
     icon: <ImProfile />,
   },
-  
 ];
 
 export default links;
