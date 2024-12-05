@@ -9,6 +9,7 @@ import { IoIosBookmarks } from "react-icons/io";
 import { BsWebcamFill } from "react-icons/bs";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
 import { RiVideoUploadFill } from "react-icons/ri";
+import { SiCoursera } from "react-icons/si";
 
 const links = [
   {
@@ -32,9 +33,9 @@ const links = [
     icon: <BsWebcamFill />,
   },
   {
-    text: "About Us",
-    path: "about",
-    icon: <MdOutlineRoomPreferences />,
+    text: "Courses",
+    path: "courses",
+    icon: <SiCoursera />,
   },
   {
     text: "Dataset",
