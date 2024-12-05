@@ -27,3 +27,10 @@ export {default as NmfHeaders} from './NmfHeaders';
 export {default as NmfGrid} from './NmfGrid'
 export { default as CoursePage } from "./Courses";
 export { default as predictionHeading } from "./predictionHeading";
+export {default as DashBoardHero} from './DashBoardHero'
+export {default as Whoare} from './Whoare'
+export {default as DashDatasets} from  './DashDatasets';
+export {default as DashCourses} from './DashCourses';
+export {default as DashDicionary} from './DashDictionary'
+export {default as DashRealTime} from './DashRealTime'
+export {default as Stats } from './Stats';
