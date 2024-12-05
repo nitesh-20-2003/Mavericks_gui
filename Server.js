@@ -7,6 +7,7 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import connectDB from "./db/connect.js";
+import courseRoutes from "./routes/courseRoutes.js"; 
 
 dotenv.config();
 const app = express();
@@ -31,9 +32,11 @@ import authRouter from "./routes/authRouter.js";
 import videoRoutes from "./routes/videoRouter.js";
 import charRouter from "./routes/characters.js";
 
+
 app.use("/api/auth", authRouter);
 app.use("/api/videos", videoRoutes);
 app.use("/api/char", charRouter);
+app.use("/api/courses", courseRoutes);
 
 
 app.get("/api/test", (req, res) => {

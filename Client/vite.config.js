@@ -7,7 +7,7 @@ export default defineConfig({
     proxy: {
       // Proxy all Express API routes to the Express server
       "/api": {
-        target: "http://localhost:5100", // Express server running on port 5100
+        target: "http://localhost:5100/api", // Express server running on port 5100
         changeOrigin: true, // Ensures proper handling of CORS
         rewrite: (path) => path.replace(/^\/api/, ""), // Optional: removes '/api' from the path before forwarding to Express
       },

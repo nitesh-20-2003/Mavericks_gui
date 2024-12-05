@@ -25,5 +25,5 @@ export {default as WordsGrid} from './WordsGrid';
 export {default as WordsList} from './WordsList';
 export {default as NmfHeaders} from './NmfHeaders';
 export {default as NmfGrid} from './NmfGrid'
-// 
+export { default as CoursePage } from "./Courses";
 export { default as predictionHeading } from "./predictionHeading";

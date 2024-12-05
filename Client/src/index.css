@@ -54,8 +54,8 @@ html {
 
   --dark-mode-bg-color: #333;
   --dark-mode-text-color: #f0f0f0;
-  --dark-mode-bg-secondary-color: #3f3f3f;
-  --dark-mode-text-secondary-color: var(--grey-300);
+  --dark-mode-bg-primary-color: #3f3f3f;
+  --dark-mode-text-primary-color: var(--grey-300);
 
   --background-color: var(--grey-50);
   --text-color: oklch(var(--ac));

@@ -25,7 +25,7 @@ import {
 // actions
 import {action as RegisterAction} from './pages/Register'
 import { action as LoginAction } from "./pages/Login";
-import { VideosPage, UploadVideo } from "./Components";
+import { VideosPage, UploadVideo, CoursePage } from "./Components";
 
 const router = createBrowserRouter([
   {
@@ -96,8 +96,8 @@ const router = createBrowserRouter([
             element: <UploadVideo />,
           },
           {
-            path: "about",
-            element: <UnderConstruction />,
+            path: "courses",
+            element: <CoursePage />,
           },
           {
             path: "your-space",
