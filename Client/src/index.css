@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+Bhai+2:wght@400..800&family=Great+Vibes&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -316,7 +317,7 @@ button:disabled {
 }
 
 
-.btn-container {
+/* .btn-container {
   margin-bottom: 4rem;
   display: flex;
   justify-content: center;
@@ -337,4 +338,4 @@ button:disabled {
 .filter-btn:hover {
   background: var(--clr-gold);
   color: var(--clr-white);
-}
+} */
