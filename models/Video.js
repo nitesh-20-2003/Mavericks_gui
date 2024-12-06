@@ -19,10 +19,14 @@ const VideoSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ["happy", "sad", "laugh", "cry", "questioning"], // Enum for valid categories
+    enum: ["happy", "sad", "laugh", "cry", "questioning"],
     required: true,
   },
+  username: {
+    type: String,
+    required: true,
+  },
+  
 });
 
-const Video = mongoose.model("Video", VideoSchema);
-export default Video;
+export default mongoose.model("Video", VideoSchema);

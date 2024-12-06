@@ -8,7 +8,10 @@ export const action = async ({ request }) => {
   const formData = await request.formData();
   const data = Object.fromEntries(formData);
   try {
-    await customFetch.post("/auth/login", data);
+    // Send login request to the backend
+    const response = await customFetch.post("/auth/login", data);
+    // Save token to localStorage
+    localStorage.setItem("token", response.data.token);  // Assuming token is returned in response
     toast.success("Login successful");
     return redirect("/dashboard");
   } catch (error) {
@@ -16,6 +19,7 @@ export const action = async ({ request }) => {
     return error;
   }
 };
+
 const Login = () => {
   const navigate = useNavigate();
 
@@ -25,29 +29,37 @@ const Login = () => {
       password: "secret123",
     };
     try {
-      await customFetch.post("/auth/login", data);
+      const response = await customFetch.post("/auth/login", data);
+      // Save token to localStorage
+      localStorage.setItem("token", response.data.token);  // Assuming token is returned in response
       toast.success("Take a test drive");
       navigate("/dashboard");
     } catch (error) {
       toast.error(error?.response?.data?.msg);
     }
   };
+
   return (
     <Wrapper>
       <Form method="post" className="form">
         <Logo />
-        <h4>login</h4>
+        <h4>Login</h4>
         <FormRow type="email" name="email" />
         <FormRow type="password" name="password" />
         <SubmitBtn />
-        <div className="flex ustify-center text-center "></div>
+        
+        <div className="flex justify-center text-center"></div>
+        
+        {/* Demo login button */}
         <button
           type="button"
           className="btn btn-outline btn-secondary w-[100%]"
           onClick={loginDemoUser}
         >
-          explore the app
+          Explore the app
         </button>
+
+        {/* Register link */}
         <p>
           Not a member yet?
           <Link to="/register" className="member-btn">
@@ -58,4 +70,5 @@ const Login = () => {
     </Wrapper>
   );
 };
+
 export default Login;

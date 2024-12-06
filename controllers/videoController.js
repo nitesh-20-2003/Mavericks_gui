@@ -1,63 +1,71 @@
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 import Video from "../models/Video.js";
+import jwt from "jsonwebtoken"; // Importing jwt for token verification
+import dotenv from "dotenv";
+import { StatusCodes } from "http-status-codes";
 
-// Configure Cloudinary (ensure your Cloudinary keys are correct)
+dotenv.config();
+
+// Configure Cloudinary
 cloudinary.config({
-  cloud_name: "dl1tgeiir", // Replace with your Cloudinary cloud name
-  api_key: "988369427315349", // Replace with your Cloudinary API key
-  api_secret: "5O9J8VhRJdp9ZXOZJ2QX_pRiNuM", // Replace with your Cloudinary API secret
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 // Configure Multer
 const storage = multer.diskStorage({});
 const upload = multer({ storage });
-
-// Middleware for uploading files
 export const uploadMiddleware = upload.single("file");
 
-// Upload Video to Cloudinary
+
+// Upload Video
 export const uploadVideo = async (req, res) => {
   const { title, description, category } = req.body;
+  const username = req.user?.username; // Extract the username from the token
 
+  if (!username) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ message: "Username is missing in the token" });
+  }
+
+  // Validation checks
   if (!req.file) {
-    return res.status(400).json({ message: "No video file uploaded" });
+    return res.status(StatusCodes.BAD_REQUEST).json({ message: "No video file uploaded" });
   }
 
-  if (!category) {
-    return res.status(400).json({ message: "Category (expression type) is required" });
+  if (!title || !description || !category) {
+    return res.status(StatusCodes.BAD_REQUEST).json({ message: "All fields (title, description, category) are required" });
   }
 
-  // Define valid categories
   const validCategories = ["happy", "sad", "laugh", "cry", "questioning"];
   if (!validCategories.includes(category)) {
-    return res.status(400).json({ message: "Invalid category" });
+    return res.status(StatusCodes.BAD_REQUEST).json({ message: "Invalid category" });
   }
 
   try {
-    // Dynamically set the folder path
+    // Upload video to Cloudinary
     const folderPath = `videos/uploads/${category}`;
-
-    // Upload the video to Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
       resource_type: "video",
       folder: folderPath,
     });
 
-    // Save video details in MongoDB
+    // Save video data to the database
     const video = new Video({
       title,
       description,
       url: result.secure_url,
       public_id: result.public_id,
       category,
+      username, // Using the username from the token
     });
 
     await video.save();
-    res.status(201).json({ message: "Video uploaded successfully", video });
+    res.status(StatusCodes.CREATED).json({ message: "Video uploaded successfully", video });
   } catch (error) {
     console.error("Error uploading video:", error);
-    res.status(500).json({ message: `Failed to upload video: ${error.message}` });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: `Failed to upload video: ${error.message}` });
   }
 };
 
@@ -87,50 +95,3 @@ export const getAllVideos = async (req, res) => {
   }
 };
 
-// Fetch Videos by Expression (category)
-export const getVideosByExpression = async (req, res) => {
-  const { expression } = req.params;
-
-  // Validate if the expression is one of the accepted types
-  const validExpressions = ["happy", "sad", "laugh", "cry", "questioning"];
-  if (!validExpressions.includes(expression)) {
-    return res.status(400).json({ message: "Invalid expression type" });
-  }
-
-  try {
-    const videos = await Video.find({ category: expression });
-
-    if (!videos.length) {
-      return res.status(404).json({ message: `No videos found for ${expression}` });
-    }
-
-    res.status(200).json(videos);
-  } catch (error) {
-    console.error("Failed to fetch videos by expression:", error);
-    res.status(500).json({ message: `Failed to fetch videos: ${error.message}` });
-  }
-};
-
-// Delete Video
-export const deleteVideo = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Find the video by ID in the database
-    const video = await Video.findById(id);
-    if (!video) {
-      return res.status(404).json({ message: "Video not found" });
-    }
-
-    // Delete video from Cloudinary
-    await cloudinary.uploader.destroy(video.public_id, { resource_type: "video" });
-
-    // Delete video from the database
-    await video.deleteOne();
-
-    res.status(200).json({ message: "Video deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting video:", error);
-    res.status(500).json({ message: `Failed to delete video: ${error.message}` });
-  }
-};

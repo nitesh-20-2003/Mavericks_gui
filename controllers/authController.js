@@ -22,21 +22,27 @@ export const login = async (req, res) => {
 
   if (!user) throw new UnauthenticatedError("invalid credentials");
 
-  const isPasswordCorrect = await comparePassword(
-    req.body.password,
-    user.password
-  );
-
+  const isPasswordCorrect = await comparePassword(req.body.password, user.password);
   if (!isPasswordCorrect) throw new UnauthenticatedError("invalid credentials");
+
   const oneDay = 1000 * 60 * 60 * 24;
-  const token = createJWT({ userId: user._id, role: user.role });
+  const token = createJWT({ userId: user._id, role: user.role, username: user.name });
+
+  // Set the token in the cookie
   res.cookie("token", token, {
     httpOnly: true,
     expires: new Date(Date.now() + oneDay),
     secure: process.env.NODE_ENV === "production",
+    sameSite: "None", // For cross-origin requests
   });
-  res.status(StatusCodes.ACCEPTED).json({ msg: `welcome ${user.name}` });
+
+  // Send the token in the response body for localStorage
+  res.status(StatusCodes.ACCEPTED).json({
+    msg: `welcome ${user.name}`,
+    token: token, // Send token in the response body
+  });
 };
+
 export const logout = (req, res) => {
   res.cookie("token", "logout", {
     httpOnly: true,

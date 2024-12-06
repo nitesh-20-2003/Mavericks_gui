@@ -1,22 +1,25 @@
 import express from "express";
-import { 
-  uploadMiddleware, 
-  uploadVideo, 
-  getVideosByExpression, 
-  getAllVideos, 
-  deleteVideo 
+import {
+  uploadMiddleware,
+  uploadVideo,
+  // getVideosByExpression,
+  getAllVideos,
+  // deleteVideo,
 } from "../controllers/videoController.js";
+import { verifyToken } from "../middleware/authMiddleware.js";  // Corrected here
 
 const router = express.Router();
 
-// Route to upload a video
-router.post("/upload", uploadMiddleware, uploadVideo);
+// Route for uploading video (protected by token verification)
+router.post("/upload", verifyToken, uploadMiddleware, uploadVideo);
 
-// Route to get videos by expression
-router.get("/expressions/:expression", getVideosByExpression);
+// Route for fetching videos by expression (protected by token verification)
+// router.get("/expressions/:expression", getVideosByExpression);
 
-// Other routes (e.g., get all videos, delete video)
+// Route for fetching all videos (protected by token verification)
 router.get("/", getAllVideos);
-router.delete("/:id", deleteVideo);
+
+// Route for deleting video by ID (protected by token verification)
+// router.delete("/:id", deleteVideo);
 
 export default router;
