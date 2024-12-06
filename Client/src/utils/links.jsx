@@ -46,7 +46,7 @@ const links = [
 
   {
     text: "Profile",
-    path: `/profile`,
+    path: "Profile",
     icon: <ImProfile />,
   },
 ];
