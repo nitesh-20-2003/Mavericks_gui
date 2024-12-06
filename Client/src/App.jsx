@@ -1,3 +1,4 @@
+import React from 'react';
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 // elements
 import {
@@ -20,12 +21,21 @@ import {
   Nmf,
   Profile,
   Prediction
-
 } from "./pages";
 // actions
-import {action as RegisterAction} from './pages/Register'
+import { action as RegisterAction } from './pages/Register';
 import { action as LoginAction } from "./pages/Login";
-import { VideosPage, UploadVideo, CoursePage } from "./Components";
+import { VideosPage, UploadVideo, CoursePage, CommunityFeed } from "./Components";
+
+// react-alert setup
+import { Provider as AlertProvider } from 'react-alert';
+import AlertTemplate from 'react-alert-template-basic';
+import { positions } from 'react-alert';
+
+const options = {
+  timeout: 5000,
+  position: positions.TOP_CENTER,
+};
 
 const router = createBrowserRouter([
   {
@@ -56,10 +66,9 @@ const router = createBrowserRouter([
             element: <DashBoardLanding />,
           },
           {
-            path:"Prediction",
-            element:<Prediction />,
+            path: "Prediction",
+            element: <Prediction />,
           },
-          
           {
             path: "Dictionary",
             element: <Dictionary />,
@@ -69,7 +78,7 @@ const router = createBrowserRouter([
                 element: <DictionaryLanding />,
               },
               {
-                path: "Profie",
+                path: "Profile",  // Corrected this path to "Profile"
                 element: <Profile />,
               },
               {
@@ -100,8 +109,8 @@ const router = createBrowserRouter([
             element: <CoursePage />,
           },
           {
-            path: "your-space",
-            element: <YourSpace />,
+            path: "discussions",
+            element: <CommunityFeed />,
           },
         ],
       },
@@ -109,9 +118,12 @@ const router = createBrowserRouter([
   },
 ]);
 
-
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AlertProvider template={AlertTemplate} {...options}>
+      <RouterProvider router={router} />
+    </AlertProvider>
+  );
 }
 
 export default App;

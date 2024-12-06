@@ -10,6 +10,7 @@ import { BsWebcamFill } from "react-icons/bs";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
 import { RiVideoUploadFill } from "react-icons/ri";
 import { SiCoursera } from "react-icons/si";
+import { RiUserCommunityFill } from "react-icons/ri";
 
 const links = [
   {
@@ -45,9 +46,14 @@ const links = [
 
   {
     text: "Profile",
-    path: `/profile`,
+    path: `profile`,
     icon: <ImProfile />,
   },
+  {
+    text: "Discussions",
+    path: `discussions`,
+    icon: <RiUserCommunityFill />,
+  }
   
 ];
 
