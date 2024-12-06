@@ -1,5 +1,6 @@
-import React, { useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useDropzone } from "react-dropzone";
 
 const UploadVideo = () => {
   const [file, setFile] = useState(null);
@@ -9,117 +10,95 @@ const UploadVideo = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const fileInputRef = useRef(); // Ref for file input
+  // Check authentication status
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setMessage("User is not authenticated");
+    }
+  }, []);
 
-  // Reset form fields
-  const resetForm = () => {
-    setFile(null);
-    setTitle("");
-    setDescription("");
-    setCategory("");
-    if (fileInputRef.current) fileInputRef.current.value = ""; // Clear file input
-  };
-
-  // Handle video upload
   const handleUpload = async () => {
     if (!file || !title || !description || !category) {
       setMessage("Please fill out all fields.");
       return;
     }
 
-    // FormData setup for video upload
+    setLoading(true);
+    setMessage("");
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("title", title);
     formData.append("description", description);
     formData.append("category", category);
 
-    setLoading(true);
-    setMessage(""); // Clear previous messages
-
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:5100/api/videos/upload", {
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`, // Pass token in Authorization header
+        },
         body: formData,
       });
 
       const data = await response.json();
-      console.log("Upload response:", data); // Debugging: Log response from server
 
       if (response.ok) {
-        setMessage("Video uploaded successfully!"); // Success message
-        resetForm(); // Reset form fields
+        setMessage("Video uploaded successfully!");
+        setFile(null);
+        setTitle("");
+        setDescription("");
+        setCategory("");
       } else {
         setMessage(data.message || "Failed to upload video.");
       }
     } catch (error) {
-      setMessage(`Error uploading video: ${error.message}`);
-      console.error("Upload error:", error); // Log the error for debugging
+      setMessage("Error uploading video.");
     } finally {
       setLoading(false);
     }
   };
+
+  const onDrop = (acceptedFiles) => {
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+    }
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: "video/*",
+  });
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      style={{
-        maxWidth: "600px",
-        margin: "50px auto",
-        padding: "20px",
-        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.15)",
-        borderRadius: "15px",
-        background: "linear-gradient(145deg, #f5f7fa, #c3cfe2)",
-        fontFamily: "'Poppins', sans-serif",
-        color: "#333",
-      }}
+      className="max-w-lg mx-auto p-8 bg-gradient-to-r from-indigo-200 to-blue-200 rounded-xl shadow-xl"
     >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "20px",
-          color: "#2c3e50",
-          fontSize: "28px",
-          fontWeight: "bold",
-        }}
-      >
+      <h1 className="text-center text-3xl font-bold text-gray-800 mb-6">
         Upload Video
       </h1>
 
-      {/* Video File Input */}
+      {/* Drag and Drop Area */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
-        style={{ marginBottom: "15px" }}
+        className="border-2 border-dashed border-indigo-500 p-8 rounded-lg text-center cursor-pointer bg-gray-100 hover:bg-gray-200"
+        {...getRootProps()}
       >
-        <label
-          style={{
-            fontWeight: "bold",
-            display: "block",
-            marginBottom: "5px",
-            color: "#555",
-          }}
-        >
-          Video File
-        </label>
-        <input
-          type="file"
-          accept="video/*"
-          ref={fileInputRef} // Attach ref
-          onChange={(e) => setFile(e.target.files[0])}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "10px",
-            border: "1px solid #dfe6e9",
-            backgroundColor: "#fff",
-            color: "#333",
-            transition: "box-shadow 0.3s ease",
-          }}
-        />
+        <input {...getInputProps()} />
+        {file ? (
+          <p className="text-gray-800">{file.name}</p>
+        ) : (
+          <p className="text-gray-600">
+            Drag & Drop your video here, or click to select a file
+          </p>
+        )}
       </motion.div>
 
       {/* Title Input */}
@@ -127,31 +106,14 @@ const UploadVideo = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.2 }}
-        style={{ marginBottom: "15px" }}
+        className="mt-4"
       >
-        <label
-          style={{
-            fontWeight: "bold",
-            display: "block",
-            marginBottom: "5px",
-            color: "#555",
-          }}
-        >
-          Title
-        </label>
         <input
           type="text"
           placeholder="Enter video title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "10px",
-            border: "1px solid #dfe6e9",
-            backgroundColor: "#fff",
-            color: "#333",
-          }}
+          className="w-full p-4 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </motion.div>
 
@@ -160,31 +122,13 @@ const UploadVideo = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.3 }}
-        style={{ marginBottom: "15px" }}
+        className="mt-4"
       >
-        <label
-          style={{
-            fontWeight: "bold",
-            display: "block",
-            marginBottom: "5px",
-            color: "#555",
-          }}
-        >
-          Description
-        </label>
         <textarea
           placeholder="Enter video description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "10px",
-            border: "1px solid #dfe6e9",
-            backgroundColor: "#fff",
-            color: "#333",
-            minHeight: "80px",
-          }}
+          className="w-full p-4 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         ></textarea>
       </motion.div>
 
@@ -193,29 +137,12 @@ const UploadVideo = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.4 }}
-        style={{ marginBottom: "20px" }}
+        className="mt-4"
       >
-        <label
-          style={{
-            fontWeight: "bold",
-            display: "block",
-            marginBottom: "5px",
-            color: "#555",
-          }}
-        >
-          Category
-        </label>
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "10px",
-            border: "1px solid #dfe6e9",
-            backgroundColor: "#fff",
-            color: "#333",
-          }}
+          className="w-full p-4 border border-gray-300 rounded-lg bg-white text-gray-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="">Select Expression</option>
           <option value="happy">Happy</option>
@@ -232,21 +159,11 @@ const UploadVideo = () => {
         whileTap={{ scale: 0.95 }}
         onClick={handleUpload}
         disabled={loading}
-        style={{
-          width: "100%",
-          padding: "12px",
-          background: loading
-            ? "linear-gradient(to right, #bdc3c7, #ecf0f1)"
-            : "linear-gradient(to right, #6a11cb, #2575fc)",
-          color: "#fff",
-          border: "none",
-          borderRadius: "10px",
-          cursor: loading ? "not-allowed" : "pointer",
-          fontWeight: "bold",
-          fontSize: "16px",
-          transition: "background 0.3s ease",
-          boxShadow: "0 4px 15px rgba(0, 0, 0, 0.1)",
-        }}
+        className={`w-full mt-6 p-4 rounded-lg font-bold text-white transition-all focus:outline-none ${
+          loading
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-gradient-to-r from-indigo-500 to-blue-500 hover:from-indigo-400 hover:to-blue-400"
+        }`}
       >
         {loading ? "Uploading..." : "Upload"}
       </motion.button>
@@ -257,12 +174,9 @@ const UploadVideo = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
-          style={{
-            marginTop: "20px",
-            textAlign: "center",
-            color: message.includes("Error") ? "#e74c3c" : "#2ecc71",
-            fontWeight: "bold",
-          }}
+          className={`mt-6 text-center font-semibold ${
+            message.includes("Error") ? "text-red-500" : "text-green-500"
+          }`}
         >
           {message}
         </motion.p>
@@ -272,6 +186,3 @@ const UploadVideo = () => {
 };
 
 export default UploadVideo;
-
-
-
