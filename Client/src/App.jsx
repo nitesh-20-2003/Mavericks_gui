@@ -66,8 +66,12 @@ const router = createBrowserRouter([
             element: <DashBoardLanding />,
           },
           {
-            path: "Prediction",
-            element: <Prediction />,
+            path:"profile",
+            element:<Profile />
+          },
+          {
+            path:"Prediction",
+            element:<Prediction />,
           },
           {
             path: "Dictionary",
@@ -78,7 +82,11 @@ const router = createBrowserRouter([
                 element: <DictionaryLanding />,
               },
               {
+<<<<<<< HEAD
                 path: "Profile",  // Corrected this path to "Profile"
+=======
+                path: "Profile",
+>>>>>>> b451f973be404ec90b5dec0553e73bd20c4ac9d9
                 element: <Profile />,
               },
               {

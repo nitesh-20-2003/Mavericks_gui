@@ -1,17 +1,25 @@
 import os
 import cv2
 from flask import Blueprint, request, jsonify
+from transformers import pipeline
+from PIL import Image
 
+# Flask Blueprint
 video_blueprint = Blueprint('video', __name__)
 
-# Define directories
+# Directories
 INPUT_DIR = "./videos"
 OUTPUT_DIR = "./output_frames"
+CLASSIFICATION_OUTPUT = "./classification_results"
 
-@video_blueprint.route('/convert', methods=['POST'])
-def convert_video_to_frames():
+# Hugging Face Model
+pipe = pipeline("image-classification", "parasahuja23/vit-base-patch16-224-in21k-finetuned-eurosat")
+
+# Route to Convert Video to Frames and Classify Images
+@video_blueprint.route('/process', methods=['POST'])
+def process_video():
     """
-    Flask route to handle video uploads and convert them to frames.
+    Flask route to handle video uploads, convert them to frames, and classify each frame.
     """
     if 'video' not in request.files:
         return jsonify({"error": "No video file provided"}), 400
@@ -25,15 +33,19 @@ def convert_video_to_frames():
 
     # Convert the video to frames
     frame_paths = extract_frames(video_path, OUTPUT_DIR)
+    if not frame_paths:
+        return jsonify({"error": "No frames were extracted"}), 500
 
-    # Clean up video after extracting frames
+    # Classify each frame
+    classification_results = classify_frames(frame_paths)
+
+    # Clean up video after processing
     os.remove(video_path)
 
     return jsonify({
         "message": f"Video {video_file.filename} processed successfully!",
-        "frame_paths": frame_paths
+        "classification_results": classification_results
     })
-
 
 def extract_frames(video_path, output_dir):
     """
@@ -61,5 +73,37 @@ def extract_frames(video_path, output_dir):
 
     cap.release()
     print(f"Processed {video_name}, extracted {frame_count} frames.")
-
     return frame_paths
+
+def classify_frames(frame_paths):
+    """
+    Classify each frame using the Hugging Face image classification pipeline.
+    Returns a list of classification results.
+    """
+    os.makedirs(CLASSIFICATION_OUTPUT, exist_ok=True)
+    results = []
+
+    for frame_path in frame_paths:
+        try:
+            # Open the frame as an image
+            image = Image.open(frame_path)
+            print(f"Classifying {frame_path}")
+            # Perform classification
+            classifications = pipe(image)
+            print(f"Classifications for {frame_path}: {classifications}")
+
+            # Save classification results
+            result = {
+                "frame_path": frame_path,
+                "classifications": classifications
+            }
+            results.append(result)
+
+        except Exception as e:
+            print(f"Error classifying {frame_path}: {e}")
+            results.append({
+                "frame_path": frame_path,
+                "error": str(e)
+            })
+
+    return results
