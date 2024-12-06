@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAlert } from 'react-alert';
-
 import defaultProfilePic from '../assets/images/Sample_User_Image.png';
 
 const CommunityFeed = () => {
@@ -11,8 +10,8 @@ const CommunityFeed = () => {
   const [newPost, setNewPost] = useState({ title: '', content: '' });
   const [newComment, setNewComment] = useState({ postId: '', content: '' });
   const [visibleComments, setVisibleComments] = useState({});
-  
-  const alert = useAlert(); // Initialize useAlert hook
+
+  const alert = useAlert();
 
   useEffect(() => {
     fetchPosts();
@@ -46,10 +45,8 @@ const CommunityFeed = () => {
       const response = await axios.post('/api/posts/like', { postId });
       const updatedPost = response.data.post;
       setPosts(posts.map((post) => (post._id === postId ? updatedPost : post)));
-      alert.success('Post liked successfully!');
     } catch (err) {
       console.error('Error liking post:', err);
-      alert.error('Failed to like the post.');
     }
   };
 
@@ -83,9 +80,13 @@ const CommunityFeed = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post('/api/posts/comment', { postId, content: newComment.content }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.post(
+        '/api/posts/comment',
+        { postId, content: newComment.content },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const updatedPost = response.data.post;
       setPosts(posts.map((post) => (post._id === postId ? updatedPost : post)));
       setNewComment({ postId: '', content: '' });
@@ -99,7 +100,7 @@ const CommunityFeed = () => {
   const handleDeletePost = async (postId) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this post?');
     if (!confirmDelete) return;
-  
+
     try {
       const token = localStorage.getItem('token');
       await axios.delete(`/api/posts/${postId}`, {
@@ -112,19 +113,22 @@ const CommunityFeed = () => {
       alert.error('Failed to delete the post.');
     }
   };
-  
+
   const handleDeleteComment = async (postId, commentId) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this comment?');
-    if (!confirmDelete) return; 
+    if (!confirmDelete) return;
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.delete(`/api/posts/comment`, {
+      const response = await axios.delete(`/api/posts/${postId}/comments/${commentId}`, {
         headers: { Authorization: `Bearer ${token}` },
-        data: { postId, commentId },
       });
+
       const updatedPost = response.data.post;
-      setPosts(posts.map((post) => (post._id === postId ? updatedPost : post)));
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => (post._id === postId ? updatedPost : post))
+      );
+
       alert.success('Comment deleted successfully!');
     } catch (err) {
       console.error('Error deleting comment:', err);
@@ -155,36 +159,6 @@ const CommunityFeed = () => {
 
   return (
     <div className="max-w-5xl mx-auto p-6 bg-blue-50 min-h-screen space-y-6">
-      <h2 className="text-3xl font-bold text-blue-700 text-center">Discussions</h2>
-
-      {/* New Post Form */}
-      <form
-        onSubmit={handleAddPost}
-        className="bg-white shadow-lg rounded-lg p-6 space-y-4 border border-blue-200"
-      >
-        <h3 className="text-xl font-semibold text-blue-600">Start a New Discussion</h3>
-        <input
-          type="text"
-          placeholder="Title"
-          value={newPost.title}
-          onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-          className="input input-bordered w-full border-blue-300"
-          required
-        />
-        <textarea
-          placeholder="Share your thoughts..."
-          value={newPost.content}
-          onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
-          className="textarea textarea-bordered w-full border-blue-300"
-          rows="5"
-          required
-        ></textarea>
-        <button type="submit" className="btn btn-primary w-full bg-blue-600 border-none hover:bg-blue-700">
-          Post Discussion
-        </button>
-      </form>
-
-      {/* Posts List */}
       {posts.length === 0 ? (
         <p className="text-gray-600 text-center">No discussions available.</p>
       ) : (
@@ -194,22 +168,24 @@ const CommunityFeed = () => {
               key={post._id}
               className="bg-white shadow-lg rounded-lg p-6 hover:shadow-2xl transition-all border border-blue-200"
             >
-              {/* Profile Picture and Username */}
-              <div className="flex items-center space-x-3">
-                <img
-                  src={defaultProfilePic}
-                  alt="Profile"
-                  className="w-12 h-12 rounded-full border-2 border-blue-500"
-                />
-                <p className="text-sm text-blue-800 font-semibold">{post.username || 'Anonymous'}</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={defaultProfilePic}
+                    alt="Profile"
+                    className="w-12 h-12 rounded-full border-2 border-blue-500"
+                  />
+                  <p className="text-sm text-blue-800 font-semibold">{post.username || 'Anonymous'}</p>
+                </div>
+                <button
+                  onClick={() => handleDeletePost(post._id)}
+                  className="bg-red-600 text-white text-xs px-3 py-1 rounded-md shadow hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300"
+                >
+                  Delete
+                </button>
               </div>
-
-              {/* Post Title */}
               <h3 className="text-2xl font-bold text-blue-700 mt-3">{post.title}</h3>
-
-              {/* Post Content */}
               <p className="text-gray-800 mt-2">{post.content}</p>
-
               <div className="mt-4 flex justify-between items-center">
                 <button
                   onClick={() => handleLike(post._id)}
@@ -221,67 +197,56 @@ const CommunityFeed = () => {
                   Posted on {new Date(post.createdAt).toLocaleDateString()}
                 </span>
               </div>
-
-              {/* Delete Post Button */}
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={() => handleDeletePost(post._id)}
-                  className="btn btn-outline btn-sm text-red-600 hover:bg-red-600 hover:text-white"
-                >
-                  Delete Post
-                </button>
-              </div>
-
-              {/* Toggle Button for Comments */}
               <div className="mt-4">
                 <button
                   onClick={() => toggleCommentsVisibility(post._id)}
-                  className="btn btn-outline btn-sm text-blue-600 hover:bg-blue-600 hover:text-white"
+                  className="text-sm text-blue-600 hover:underline focus:outline-none"
                 >
-                  {visibleComments[post._id] ? 'Hide Comments' : 'Show Comments'}
+                  {visibleComments[post._id] ? 'Hide comments' : 'Show comments'}
                 </button>
-
-                {/* Comments Section */}
                 {visibleComments[post._id] && (
-                  <div className="mt-4 space-y-2">
+                  <div className="mt-4">
                     {post.comments.map((comment) => (
-                      <div key={comment._id} className="flex justify-between items-center">
-                        <div className="flex items-center space-x-3">
-                          <img
-                            src={defaultProfilePic}
-                            alt="Profile"
-                            className="w-6 h-6 rounded-full"
-                          />
-                          <p className="text-sm text-gray-700">{comment.username || 'Anonymous'}: {comment.content}</p>
+                      <div
+                        key={comment._id}
+                        className="bg-gray-50 p-4 rounded-lg shadow-sm space-y-2"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={defaultProfilePic}
+                              alt="Profile"
+                              className="w-8 h-8 rounded-full border-2 border-blue-300"
+                            />
+                            <p className="text-sm text-blue-600">{comment.username || 'Anonymous'}</p>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteComment(post._id, comment._id)}
+                            className="bg-red-600 text-white text-xs px-3 py-1 rounded-md shadow hover:bg-red-500 focus:outline-none focus:ring focus:ring-red-300"
+                          >
+                            Delete
+                          </button>
                         </div>
-                        <button
-                          onClick={() => handleDeleteComment(post._id, comment._id)}
-                          className="text-red-600 hover:text-red-800 text-xs"
-                        >
-                          Delete
-                        </button>
+                        <p className="text-sm text-gray-700">{comment.content}</p>
                       </div>
                     ))}
-
-                    {/* Add New Comment */}
-                    <form
-                      onSubmit={(e) => handleAddComment(e, post._id)}
-                      className="mt-4 space-y-4"
-                    >
-                      <textarea
-                        placeholder="Write a comment..."
-                        value={newComment.content}
-                        onChange={(e) => setNewComment({ ...newComment, content: e.target.value, postId: post._id })}
-                        className="textarea textarea-bordered w-full border-blue-300"
-                        rows="3"
-                        required
-                      ></textarea>
-                      <button type="submit" className="btn btn-primary w-full bg-blue-600 border-none hover:bg-blue-700">
-                        Add Comment
-                      </button>
-                    </form>
                   </div>
                 )}
+              </div>
+              <div className="mt-6">
+                <textarea
+                  placeholder="Add a comment..."
+                  value={newComment.content}
+                  onChange={(e) => setNewComment({ ...newComment, content: e.target.value, postId: post._id })}
+                  className="textarea textarea-bordered w-full border-blue-300"
+                  rows="3"
+                ></textarea>
+                <button
+                  onClick={(e) => handleAddComment(e, post._id)}
+                  className="btn btn-primary btn-sm mt-2"
+                >
+                  Add Comment
+                </button>
               </div>
             </div>
           ))}
@@ -292,7 +257,3 @@ const CommunityFeed = () => {
 };
 
 export default CommunityFeed;
-
-
-
-

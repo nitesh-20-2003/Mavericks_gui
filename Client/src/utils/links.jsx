@@ -10,11 +10,8 @@ import { BsWebcamFill } from "react-icons/bs";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
 import { RiVideoUploadFill } from "react-icons/ri";
 import { SiCoursera } from "react-icons/si";
-<<<<<<< HEAD
 import { RiUserCommunityFill } from "react-icons/ri";
-=======
 import { SiSemanticscholar } from "react-icons/si";
->>>>>>> b451f973be404ec90b5dec0553e73bd20c4ac9d9
 
 const links = [
   {

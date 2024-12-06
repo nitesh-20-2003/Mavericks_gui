@@ -2,6 +2,7 @@ import Post from '../models/Post.js';
 import jwt from 'jsonwebtoken'; // Importing jwt for token verification
 import dotenv from 'dotenv';
 import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
 
 dotenv.config();
 
@@ -131,6 +132,14 @@ export const deletePost = async (req, res) => {
   export const deleteComment = async (req, res) => {
     const { postId, commentId } = req.params;
   
+    console.log('Post ID:', postId); // Log to check the value of postId
+    console.log('Comment ID:', commentId); // Log to check the value of commentId
+  
+    // Validate the postId and commentId to ensure they are valid ObjectIds
+    if (!mongoose.Types.ObjectId.isValid(postId) || !mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({ message: "Invalid post or comment ID" });
+    }
+  
     try {
       const post = await Post.findById(postId);
       if (!post) {
@@ -146,7 +155,7 @@ export const deletePost = async (req, res) => {
       post.comments.splice(commentIndex, 1);
   
       // Save the post with the updated comments array
-      await post.save();
+      await post.updateOne({ comments: post.comments });
   
       res.status(200).json({ message: "Comment deleted successfully" });
     } catch (err) {

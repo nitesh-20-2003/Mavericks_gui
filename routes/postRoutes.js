@@ -9,6 +9,5 @@ router.post('/', verifyToken, addPost); // Add a new post
 router.post('/like', likePost); // Like a post
 router.post('/comment', verifyToken, addComment); // Add a comment to a post
 router.delete('/:postId', verifyToken, deletePost); // Delete a post
-router.delete('/:postId/comment/:commentId', verifyToken, deleteComment); // Delete a comment
-
+router.delete('/:postId/comments/:commentId', verifyToken, deleteComment);
 export default router;
