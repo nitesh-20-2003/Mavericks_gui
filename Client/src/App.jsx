@@ -82,11 +82,7 @@ const router = createBrowserRouter([
                 element: <DictionaryLanding />,
               },
               {
-<<<<<<< HEAD
-                path: "Profile",  // Corrected this path to "Profile"
-=======
                 path: "Profile",
->>>>>>> b451f973be404ec90b5dec0553e73bd20c4ac9d9
                 element: <Profile />,
               },
               {
