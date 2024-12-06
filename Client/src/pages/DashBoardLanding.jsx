@@ -1,11 +1,18 @@
 import React from "react";
-import ISLInfo from "../Components/HomeInfo";
-import Footer from "../Components/Footer";
+import { DashBoardHero ,Whoare,DashDatasets,DashCourses,
+  DashDicionary,DashRealTime,Footer,Stats
+} from "../Components";
 const Landing = () => {
   return (
     <div>
-      <ISLInfo />
-      <Footer />
+        <DashBoardHero />
+        <Whoare />
+        <Stats />
+        <DashDatasets />
+        <DashCourses />
+        <DashDicionary />
+        <DashRealTime />
+        {/* <Footer /> */}
     </div>
   );
 };

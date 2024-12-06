@@ -29,7 +29,7 @@ const links = [
   },
   {
     text: "predict",
-    path: "predict",
+    path: "Prediction",
     icon: <BsWebcamFill />,
   },
   {

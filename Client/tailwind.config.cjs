@@ -4,15 +4,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        greatVibes: ['"Great Vibes"', "serif"], 
+        greatVibes: ['"Great Vibes"', "serif"],
+        baloo: ['"Baloo Bhai 2"', "cursive"],
       },
     },
   },
   plugins: [require("daisyui")],
   daisyui: {
     themes: ["fantasy", "dracula", "retro", "dark"],
-
-
-    
   },
 };

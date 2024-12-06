@@ -1,6 +1,27 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 // elements
-import { HomeLayout ,Error,Datasets,Stats,Landing,About,UnderConstruction,YourSpace,DashBoardLanding,DashBoardLayout ,Login ,Register,Dictionary,Words,DictionaryLanding,Characters,Nmf,Profile} from "./pages";
+import {
+  HomeLayout,
+  Error,
+  Datasets,
+  Stats,
+  Landing,
+  About,
+  UnderConstruction,
+  YourSpace,
+  DashBoardLanding,
+  DashBoardLayout,
+  Login,
+  Register,
+  Dictionary,
+  Words,
+  DictionaryLanding,
+  Characters,
+  Nmf,
+  Profile,
+  Prediction
+
+} from "./pages";
 // actions
 import {action as RegisterAction} from './pages/Register'
 import { action as LoginAction } from "./pages/Login";
@@ -35,29 +56,34 @@ const router = createBrowserRouter([
             element: <DashBoardLanding />,
           },
           {
+            path:"Prediction",
+            element:<Prediction />,
+          },
+          
+          {
             path: "Dictionary",
             element: <Dictionary />,
             children: [
               {
                 index: true,
-                element:<DictionaryLanding />,
+                element: <DictionaryLanding />,
               },
               {
-                path:"Profie",
-                element:<Profile />
+                path: "Profie",
+                element: <Profile />,
               },
               {
-                path:"Words",
-                element:<Words />,
+                path: "Words",
+                element: <Words />,
               },
               {
-                path:"Characters",
-                element:<Characters />
+                path: "Characters",
+                element: <Characters />,
               },
               {
-                path:"Nmf",
-                element:<Nmf />,
-              }
+                path: "Nmf",
+                element: <Nmf />,
+              },
             ],
           },
           { path: "stats", element: <Stats /> },

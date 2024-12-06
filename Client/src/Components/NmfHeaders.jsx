@@ -20,7 +20,7 @@ const NmfHeaders = () => {
     <div className="w-[90vw] max-w-[1120px] mx-auto py-8 border-b border-base-300">
       {/* Header */}
       <div className="flex text-center justify-center mb-6">
-        <h1 className="font-greatVibes text-zinc-700">Non-Manual Features</h1>
+        <h1 className="font-baloo text-zinc-700">Non-Manual Features</h1>
       </div>
 
       {/* Buttons Grid */}

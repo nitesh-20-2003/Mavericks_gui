@@ -17,3 +17,4 @@ export {default as DictionaryLanding} from './DictionaryLanding';
 export {default as Characters} from './Characters'
 export {default as Nmf} from './Nmf';
 export {default as Profile} from './Profile'
+export { default as Prediction } from "./Prediction";
