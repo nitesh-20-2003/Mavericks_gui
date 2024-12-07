@@ -132,10 +132,6 @@ export const deletePost = async (req, res) => {
   export const deleteComment = async (req, res) => {
     const { postId, commentId } = req.params;
   
-    console.log('Post ID:', postId); // Log to check the value of postId
-    console.log('Comment ID:', commentId); // Log to check the value of commentId
-  
-    // Validate the postId and commentId to ensure they are valid ObjectIds
     if (!mongoose.Types.ObjectId.isValid(postId) || !mongoose.Types.ObjectId.isValid(commentId)) {
       return res.status(400).json({ message: "Invalid post or comment ID" });
     }
@@ -154,13 +150,15 @@ export const deletePost = async (req, res) => {
       // Remove the comment
       post.comments.splice(commentIndex, 1);
   
-      // Save the post with the updated comments array
-      await post.updateOne({ comments: post.comments });
+      // Save the updated post
+      await post.save();
   
-      res.status(200).json({ message: "Comment deleted successfully" });
+      // Return the updated comments array
+      res.status(200).json({ comments: post.comments });
     } catch (err) {
       console.error("Error deleting comment:", err);
       res.status(500).json({ message: "Error deleting comment", error: err.message });
     }
   };
+  
   
