@@ -165,10 +165,7 @@ const CommunityFeed = () => {
       <div className="bg-blue-100 p-6 rounded-lg shadow-lg mb-6 flex flex-col items-center justify-center text-center">
   <h1 className="text-3xl font-bold text-blue-800">Welcome to the Community Feed</h1>
   <p className="text-lg text-gray-700 mt-2">
-    Join discussions, share your thoughts, and connect with others! Whether it's a question, an idea, or an opinion, this is the space to express yourself.
-  </p>
-  <p className="text-md text-gray-600 mt-4">
-    Engage with the posts, leave comments, or add your own post. Let's build a community of learning and growth!
+    Join discussions, share your thoughts, and connect with others! 
   </p>
 </div>
 
