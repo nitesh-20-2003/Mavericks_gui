@@ -10,6 +10,7 @@ import { BsWebcamFill } from "react-icons/bs";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
 import { RiVideoUploadFill } from "react-icons/ri";
 import { SiCoursera } from "react-icons/si";
+import { RiUserCommunityFill } from "react-icons/ri";
 import { SiSemanticscholar } from "react-icons/si";
 
 const links = [
@@ -43,9 +44,13 @@ const links = [
     path: "Datasets",
     icon: <MdDatasetLinked />,
   },
-
   {
-    text: "Profile",
+    text: "Discussions",
+    path: `discussions`,
+    icon: <RiUserCommunityFill />,
+  },
+  {
+  text: "Profile",
     path: "Profile",
     icon: <ImProfile />,
   },
