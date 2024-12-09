@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import User from "../assets/images/User.svg";
 import { toast } from "react-toastify";
-
+import Paras from '../assets/images/paras.png'
 const Profile = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -28,7 +28,15 @@ const Profile = () => {
   };
 
   const handleSubmit = (e) => {
-    toast.success('User Profile Updated !!')
+    toast.success(
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <img
+          src={Paras}
+          alt="Example"
+          style={{ width: 50, height: 50, marginRight: 10 }}
+        />
+        <span className="capitalize font-mono">Hello i am Paras ahuja</span>
+      </div>);
     e.preventDefault();
     console.log("Form submitted:", formData);
     // You can add functionality to handle the form submission like API calls

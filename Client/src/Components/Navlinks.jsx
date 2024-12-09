@@ -7,7 +7,7 @@ const NavLinks = ({ isBigSidebar }) => {
   const dispatch = useDispatch();
 
   const handleSidebarToggle = () => {
-    console.log("Toggling sidebar...");
+    // console.log("Toggling sidebar...");
     dispatch(toggleSidebar());
   };
 

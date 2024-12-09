@@ -15,6 +15,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mediapipe/drawing_utils": "^0.3.1675466124",
+    "@mediapipe/hands": "^0.4.1675469240",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",
     "concurrently": "^8.0.1",

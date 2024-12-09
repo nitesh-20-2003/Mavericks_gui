@@ -19,7 +19,7 @@ const SmallSidebar = () => {
           <button
             type="button"
             className="close-btn"
-            onClick={() => dispatch(toggleSidebar())}
+            // onClick={() => dispatch(toggleSidebar())}
           >
             <FaTimes />
           </button>

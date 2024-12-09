@@ -1,253 +1,157 @@
-import React, { useState, useRef, useEffect } from "react";
-import axios from "axios";
-import { BsFillRecordBtnFill } from "react-icons/bs";
-import { AiOutlineStop } from "react-icons/ai";
-
-function Prediction() {
-  const [isRecording, setIsRecording] = useState(false);
-  const [videoBlob, setVideoBlob] = useState(null);
-  const [isCameraInitialized, setIsCameraInitialized] = useState(false);
-  const [predictedEmotion, setPredictedEmotion] = useState("");
-  const [inputString, setInputString] = useState("");
-  const [generatedString, setGeneratedString] = useState("");
-  const [nonManualFeatures, setNonManualFeatures] = useState([]);
+import React, { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
+import { BiVideoRecording } from "react-icons/bi";
+import { FaCircleStop } from "react-icons/fa6";
+const Prediction = () => {
   const videoRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-  const recordedChunks = useRef([]);
-  const [options,setDropdown]=useState(null);
+  const canvasRef = useRef(null);
+  const [socket, setSocket] = useState(null);
+  const [response, setResponse] = useState("Waiting for predictions...");
 
   useEffect(() => {
-    if (!isCameraInitialized) {
-      initializeCamera();
-    
-    }
-    return () => stopStream();
+    // Initialize WebSocket connection
+    const socketInstance = io("http://localhost:5000");
+    setSocket(socketInstance);
+
+    return () => {
+      socketInstance.disconnect();
+    };
   }, []);
 
-  // Initialize camera function
-  const initializeCamera = () => {
-    return navigator.mediaDevices
-      .getUserMedia({
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          frameRate: { ideal: 30 },
-        },
-      })
+  const startWebcam = () => {
+    navigator.mediaDevices
+      .getUserMedia({ video: true })
       .then((stream) => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          setIsCameraInitialized(true);
-        }
-      })
-      .catch((err) => console.error("Error accessing camera: ", err));
-  };
-
-  // Fetch non-manual features from backend
-
-  const startRecording = () => {
-    if (!videoRef.current?.srcObject) {
-      initializeCamera().then(() => {
-        startMediaRecorder();
-      });
-    } else {
-      startMediaRecorder();
-    }
-  };
-
-  const startMediaRecorder = () => {
-    setIsRecording(true);
-    recordedChunks.current = [];
-
-    const options = { mimeType: "video/webm; codecs=vp8" };
-    const mediaRecorder = new MediaRecorder(
-      videoRef.current.srcObject,
-      options
-    );
-    mediaRecorderRef.current = mediaRecorder;
-
-    mediaRecorder.ondataavailable = (event) => {
-      recordedChunks.current.push(event.data);
-    };
-    mediaRecorder.onstop = handleRecordingStop;
-    mediaRecorder.start();
-  };
-
-  const stopRecording = () => {
-    setIsRecording(false);
-    if (mediaRecorderRef.current) {
-      mediaRecorderRef.current.stop();
-    }
-    stopStream();
-  };
-
-  const stopStream = () => {
-    if (videoRef.current?.srcObject) {
-      const tracks = videoRef.current.srcObject.getTracks();
-      tracks.forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
-    }
-    setIsCameraInitialized(false);
-  };
-
-  const handleRecordingStop = () => {
-    const videoBlobData = new Blob(recordedChunks.current, {
-      type: "video/webm",
-    });
-    setVideoBlob(videoBlobData);
-    sendVideoToServer(videoBlobData);
-  };
-
-  const sendVideoToServer = (videoBlob) => {
-    const formData = new FormData();
-    formData.append("video", videoBlob, "video.webm");
-
-    axios
-      .post("http://localhost:5000/video/convert", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        console.log("Video processed successfully!", response.data);
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
       })
       .catch((error) => {
-        console.error("Error processing video:", error);
+        console.error("Error accessing webcam:", error);
       });
   };
 
-  const handleEmotionChange = (event) => {
-    setPredictedEmotion(event.target.value);
+  const captureFrames = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+
+    const processFrame = () => {
+      if (video.readyState !== 4) return;
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob((blob) => {
+        if (blob && socket) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64Image = reader.result;
+            socket.emit("process_frame", base64Image);
+          };
+          reader.readAsDataURL(blob);
+        } else {
+          console.error("Failed to capture frame or socket not connected.");
+        }
+      }, "image/jpeg");
+    };
+
+    // Capture frames at regular intervals
+    setInterval(processFrame, 600);
   };
 
-  const handleInputChange = (event) => {
-    setInputString(event.target.value);
-  };
+  useEffect(() => {
+    startWebcam();
+    captureFrames();
 
-  const handleGenerateString = async () => {
-    try {
-      const response = await axios.post("http://localhost:5000/ai/generate", {
-        sentence: inputString,
-        emotion: predictedEmotion,
+    if (socket) {
+      socket.on("frame_processed", (data) => {
+        console.log("Received data from server:", data);
+
+        if (data.error) {
+          setResponse(`Error: ${data.error}`);
+        } else if (data.predictions) {
+          setResponse(data.predictions.label);
+        } else {
+          setResponse("Unexpected response from server.");
+        }
       });
-      console.log("Generated response:", response.data);
-      setGeneratedString(response.data.rewritten_sentence);
-      setDropdown(response.data.non_manual_features);
-    } catch (error) {
-      console.error("Error generating string:", error);
+
+      return () => {
+        socket.off("frame_processed");
+      };
     }
-  };
+  }, [socket]);
 
-  const clearGeneratedString = () => {
-    setGeneratedString("");
-  };
-    // console.log(options);
   return (
-    <div className="w-[90vw] max-w-[1120px] mx-auto">
+    <div className=" w-[90vw] max-w-[1120px] mx-auto">
       <div className="flex items-center justify-center">
         <h2 className="font-[800] mt-6 mb-[3.5rem] capitalize font-mono text-secondary">
           Language that evokes Feelings:{" "}
           <span className="text-gray-800">ISL</span>
         </h2>
       </div>
-
-      <div className="card lg:card-side bg-base-100 shadow-2xl">
-        <figure className="">
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            className="rounded-tl-lg rounded-bl-lg bg-black w-[480px] h-[600px] md:h-[500px] md:w-[600px] lg:h-[600px] object-cover lg:w-[700px]"
-          ></video>
+      <div className="card lg:card-side bg-base-100 shadow-xl">
+        <figure>
+          <video ref={videoRef} />
+          <canvas ref={canvasRef} style={{ display: "none" }} />
         </figure>
         <div className="card-body">
-          <select className="select select-bordered w-full max-w-xs capitalize font-baloo font-[400] italic ">
-            <option disabled selected className="font-baloo">
-              Non manual features detected
-            </option>
-            {/* <option>Han Solo</option>
-            <option>Greedo</option> */}
-            
-          </select>
-
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text font-baloo font-bold text-lg">
-                Predicted Emotion
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text font-bold font-baloo  text-xl">
+                Emotion detected
               </span>
-            </label>
+            </div>
             <input
               type="text"
-              placeholder="Enter Predicted Emotion"
-              value={predictedEmotion}
-              onChange={handleEmotionChange}
-              className="input input-bordered"
+              placeholder="Type here"
+              value={response}
+              className="input input-bordered w-full max-w-xs "
             />
-          </div>
-
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text font-baloo font-bold text-lg">
-                Enter Your String
+          </label>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text  font-bold font-baloo  text-xl">
+                Enter Your input
               </span>
-            </label>
-            <textarea
-              className="textarea textarea-bordered"
-              placeholder="Type your string here"
-              value={inputString}
-              onChange={handleInputChange}
-            ></textarea>
-          </div>
-
-          <div className="form-control mb-4">
-            <label className="label">
-              <span className="label-text font-baloo font-bold text-lg">
-                Generated String
-              </span>
-            </label>
-            <textarea
-              className="textarea textarea-bordered"
-              value={generatedString}
-              readOnly
-              placeholder="Generated string based on emotion"
-            ></textarea>
-          </div>
-
-          <div className="card-actions justify-start mt-4">
-            <div className="flex items-center space-x-4">
-              {!isRecording ? (
-                <button
-                  onClick={startRecording}
-                  className="btn btn-outline rounded-full px-6 py-3"
-                >
-                  Rec <BsFillRecordBtnFill />
-                </button>
-              ) : (
-                <button
-                  onClick={stopRecording}
-                  className="btn btn-outline rounded-full px-6 py-3"
-                >
-                  Stop <AiOutlineStop />
-                </button>
-              )}
-              <button
-                onClick={handleGenerateString}
-                className="btn btn-outline"
-              >
-                Generate
-              </button>
-              <button
-                onClick={clearGeneratedString}
-                className="btn btn-outline"
-              >
-                Clear
-              </button>
             </div>
+            <textarea
+              placeholder="Bio"
+              className="textarea textarea-bordered textarea-md w-full max-w-xs"
+            ></textarea>
+          </label>
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text font-bold font-baloo  text-xl ">
+                Predicted String{" "}
+              </span>
+            </div>
+            <input
+              type="text"
+              placeholder="Type here"
+              className="input input-bordered w-full max-w-xs "
+            />
+          </label>
+
+          <div className="card-actions justify-between mt-6">
+            <button className="btn btn-outline">
+              Start{" "}
+              <span>
+                <BiVideoRecording />{" "}
+              </span>
+            </button>
+            <button className="btn btn-outline ">
+              Stop
+              <span>
+                <FaCircleStop />
+              </span>
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Prediction;
