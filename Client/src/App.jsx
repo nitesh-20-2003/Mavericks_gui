@@ -20,7 +20,8 @@ import {
   Characters,
   Nmf,
   Profile,
-  Prediction
+  Prediction,
+  DataSetCreation
 } from "./pages";
 // actions
 import { action as RegisterAction } from './pages/Register';
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
           {
             index: true,
             element: <DashBoardLanding />,
+          },
+          {
+            path:"DataSetCreation",
+            element:<DataSetCreation />,
           },
           {
             path:"profile",

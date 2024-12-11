@@ -3,9 +3,9 @@ import { io } from "socket.io-client";
 import { BiVideoRecording } from "react-icons/bi";
 import { FaCircleStop } from "react-icons/fa6";
 import axios from "axios";
-    import { toast } from "react-toastify";
-import {IslComponent} from '../Components';
-const Prediction = () => {
+import { toast } from "react-toastify";
+import { IslComponent } from ".";
+const DataSet = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [socket, setSocket] = useState(null);
@@ -31,7 +31,7 @@ const Prediction = () => {
     };
   }, []);
 
-  // Start webcam streaming
+
   const startWebcam = () => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -55,17 +55,18 @@ const Prediction = () => {
   const startRecording = () => {
     setRecording(true);
     startWebcam();
-    
+
     // Delay to ensure the webcam initializes
     setTimeout(() => {
       const id = setInterval(processFrame, 600);
       setIntervalId(id);
     }, 1000);
   };
-  
+
   // Stop recording video frames
   const stopRecording = () => {
-    toast.success("Video recording stopped succesfully !!");
+   toast.success("We appreciate your contributions! 🤗");
+
     setRecording(false);
     stopWebcam();
 
@@ -74,7 +75,7 @@ const Prediction = () => {
       setIntervalId(null);
     }
 
-    setInputsDisabled(false); 
+    setInputsDisabled(false);
   };
 
   // Process individual video frames
@@ -151,12 +152,12 @@ const Prediction = () => {
             .map(
               (feature) =>
                 Object.entries(feature)
-                   // Filter out null values
-                  .map(([key, value]) => `${key}: ${value}`) // Map keys and values into a formatted string
+                  // Filter out null values
+                  .map(([key, value]) => `${key}: ${value}`)
             )
-            .flat(); // Flatten the array of arrays
+            .flat(); 
 
-          setExtractedFeatures(validFeatures); // Update the ExtractedFeatures state
+          setExtractedFeatures(validFeatures); 
         }
 
         if (data.error) {
@@ -178,9 +179,9 @@ const Prediction = () => {
   return (
     <div className="w-[90vw] max-w-[1120px] mx-auto">
       <div className="flex items-center justify-center">
-        <h2 className="font-[800] mt-6 mb-[3.5rem] capitalize font-mono text-secondary">
-          Language that evokes Feelings:{" "}
-          <span className="text-gray-800">ISL</span>
+        <h2 className="font-[700] mt-6 mb-[3.5rem] capitalize font-mono text-secondary tracking-tighter">
+          Live Video Recording for:{" "}
+          <span className="text-gray-800"> Dataset Training</span>
         </h2>
       </div>
       <div className="card lg:card-side bg-base-100 shadow-xl">
@@ -190,19 +191,6 @@ const Prediction = () => {
         </figure>
         <div className="card-body">
           <label className="form-control w-full max-w-xs">
-            {/* <select
-              className="select select-bordered w-full max-w-xs font-baloo"
-              disabled={!ExtractedFeatures.length}
-              size={ExtractedFeatures.length || 5} // Set a higher default value for the size
-              style={{ maxHeight: "none" }} // Ensure no limit to the height of the dropdown
-            >
-              <option disabled selected>
-                Landmark Detection Mediapipe..
-              </option>
-              {ExtractedFeatures.map((feature, index) => (
-                <option key={index}>{feature}</option>
-              ))}
-            </select> */}
             <select
               className="select select-bordered select-md w-full max-w-xs h-[12rem]"
               size={ExtractedFeatures.length || 5} // Adjust this number to show all items
@@ -217,8 +205,8 @@ const Prediction = () => {
               ))}
             </select>
           </label>
-          <div className="mt-45">
-            <label className="form-control w-full max-w-xs">
+          <div className="mt-60">
+            {/* <label className="form-control w-full max-w-xs">
               <input
                 type="text"
                 value={emotionDetected}
@@ -226,9 +214,9 @@ const Prediction = () => {
                 className="input input-bordered"
                 readOnly
               />
-            </label>
+            </label> */}
 
-            <label className="form-control w-full max-w-xs mt-7">
+            {/* <label className="form-control w-full max-w-xs mt-7">
               <input
                 type="text"
                 placeholder="Enter your string"
@@ -248,7 +236,7 @@ const Prediction = () => {
                 readOnly
                 disabled={inputsDisabled}
               />
-            </label>
+            </label> */}
 
             <div className="card-actions justify-between mt-6">
               <button
@@ -265,20 +253,12 @@ const Prediction = () => {
               >
                 Stop <FaCircleStop />
               </button>
-              <button
-                className="btn btn-outline"
-                onClick={sendPredictionRequest}
-                disabled={loading || !emotionDetected || !userInput}
-              >
-                {loading ? "Sending..." : "Send to GenAI"}
-              </button>
             </div>
           </div>
         </div>
       </div>
-      <IslComponent />
     </div>
   );
 };
 
-export default Prediction;
+export default DataSet;

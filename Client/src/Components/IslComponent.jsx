@@ -3,9 +3,8 @@ import { io } from "socket.io-client";
 import { BiVideoRecording } from "react-icons/bi";
 import { FaCircleStop } from "react-icons/fa6";
 import axios from "axios";
-    import { toast } from "react-toastify";
-import {IslComponent} from '../Components';
-const Prediction = () => {
+import { toast } from "react-toastify";
+const IslComponent = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [socket, setSocket] = useState(null);
@@ -55,14 +54,14 @@ const Prediction = () => {
   const startRecording = () => {
     setRecording(true);
     startWebcam();
-    
+
     // Delay to ensure the webcam initializes
     setTimeout(() => {
       const id = setInterval(processFrame, 600);
       setIntervalId(id);
     }, 1000);
   };
-  
+
   // Stop recording video frames
   const stopRecording = () => {
     toast.success("Video recording stopped succesfully !!");
@@ -74,7 +73,7 @@ const Prediction = () => {
       setIntervalId(null);
     }
 
-    setInputsDisabled(false); 
+    setInputsDisabled(false);
   };
 
   // Process individual video frames
@@ -151,7 +150,7 @@ const Prediction = () => {
             .map(
               (feature) =>
                 Object.entries(feature)
-                   // Filter out null values
+                  // Filter out null values
                   .map(([key, value]) => `${key}: ${value}`) // Map keys and values into a formatted string
             )
             .flat(); // Flatten the array of arrays
@@ -176,33 +175,15 @@ const Prediction = () => {
   }, [socket]);
 
   return (
-    <div className="w-[90vw] max-w-[1120px] mx-auto">
+    <>
       <div className="flex items-center justify-center">
-        <h2 className="font-[800] mt-6 mb-[3.5rem] capitalize font-mono text-secondary">
-          Language that evokes Feelings:{" "}
-          <span className="text-gray-800">ISL</span>
-        </h2>
+        <h4 className="font-[800] mt-6 mb-[3.5rem] capitalize font-mono text-secondary ">
+          Real Time Isl Translation
+        </h4>
       </div>
       <div className="card lg:card-side bg-base-100 shadow-xl">
-        <figure>
-          <video ref={videoRef} />
-          <canvas ref={canvasRef} style={{ display: "none" }} />
-        </figure>
         <div className="card-body">
           <label className="form-control w-full max-w-xs">
-            {/* <select
-              className="select select-bordered w-full max-w-xs font-baloo"
-              disabled={!ExtractedFeatures.length}
-              size={ExtractedFeatures.length || 5} // Set a higher default value for the size
-              style={{ maxHeight: "none" }} // Ensure no limit to the height of the dropdown
-            >
-              <option disabled selected>
-                Landmark Detection Mediapipe..
-              </option>
-              {ExtractedFeatures.map((feature, index) => (
-                <option key={index}>{feature}</option>
-              ))}
-            </select> */}
             <select
               className="select select-bordered select-md w-full max-w-xs h-[12rem]"
               size={ExtractedFeatures.length || 5} // Adjust this number to show all items
@@ -222,7 +203,7 @@ const Prediction = () => {
               <input
                 type="text"
                 value={emotionDetected}
-                placeholder="Detected Emotion"
+                placeholder="Detected string"
                 className="input input-bordered"
                 readOnly
               />
@@ -253,13 +234,6 @@ const Prediction = () => {
             <div className="card-actions justify-between mt-6">
               <button
                 className="btn btn-outline"
-                onClick={startRecording}
-                disabled={recording}
-              >
-                Start <BiVideoRecording />
-              </button>
-              <button
-                className="btn btn-outline"
                 onClick={stopRecording}
                 disabled={!recording}
               >
@@ -276,9 +250,8 @@ const Prediction = () => {
           </div>
         </div>
       </div>
-      <IslComponent />
-    </div>
+    </>
   );
 };
 
-export default Prediction;
+export default IslComponent;
