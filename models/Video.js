@@ -19,14 +19,13 @@ const VideoSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ["happy", "sad", "laugh", "cry", "questioning"],
+    enum: ["happy", "sad", "surprise", "neutral", "anger"],
     required: true,
   },
   username: {
     type: String,
     required: true,
   },
-  
 });
 
 export default mongoose.model("Video", VideoSchema);

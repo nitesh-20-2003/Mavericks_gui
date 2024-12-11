@@ -13,7 +13,7 @@ const Whoare = () => {
         <div className="card lg:card-side bg-base-100 shadow-xl h-[10rem] w-[18rem]">
           <div className="card-body">
             <h2 className="card-title">Learners</h2>
-            <p>Lorem, ipsum dolor sit amet consectetur </p>
+            <p>Learners may include individuals from the Deaf community</p>
             <div className="card-actions justify-end"></div>
           </div>
           <figure>
@@ -27,7 +27,10 @@ const Whoare = () => {
         <div className="card lg:card-side bg-base-100 shadow-xl h-[10rem] w-[18rem]">
           <div className="card-body">
             <h2 className="card-title">Reserchers</h2>
-            <p>Lorem, ipsum dolor sit amet consectetur </p>
+            <p>
+              {" "}
+              Researchers play a key role in generating new knowledge 
+            </p>
             <div className="card-actions justify-end"></div>
           </div>
           <figure>

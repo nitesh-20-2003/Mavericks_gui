@@ -48,7 +48,7 @@ export const likePost = async (req, res) => {
     const { postId } = req.body;
   
     try {
-      console.log("Received postId:", postId);
+      // console.log("Received postId:", postId);
   
       const post = await Post.findById(postId);
       if (!post) {

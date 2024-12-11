@@ -6,9 +6,10 @@ const VideosPage = () => {
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const categories = ["all", "happy", "sad", "laugh", "cry", "questioning"];
+  const categories = ["all", "happy", "sad", "surprise", "Neutral", "anger"];
 
   const fetchVideos = async () => {
+    setLoading(true);
     try {
       const response = await fetch("http://localhost:5100/api/videos");
       if (!response.ok) {
@@ -16,20 +17,26 @@ const VideosPage = () => {
       }
 
       const fetchedVideos = await response.json();
+
+      // Retrieve the cached videos from LocalStorage
       const cachedVideos = JSON.parse(localStorage.getItem("videos") || "[]");
 
-      const allVideos = [
-        ...fetchedVideos,
-        ...cachedVideos.filter(
-          (cachedVideo) =>
-            !fetchedVideos.some(
-              (fetchedVideo) => fetchedVideo._id === cachedVideo._id
-            )
-        ),
-      ];
+      // Identify videos that are new or updated
+      const newOrUpdatedVideos = fetchedVideos.filter(
+        (fetchedVideo) =>
+          !cachedVideos.some(
+            (cachedVideo) =>
+              cachedVideo._id === fetchedVideo._id &&
+              cachedVideo.updatedAt === fetchedVideo.updatedAt
+          )
+      );
 
-      setVideos(allVideos);
-      localStorage.setItem("videos", JSON.stringify(allVideos));
+      // Combine the cached videos with the new or updated ones
+      const updatedVideos = [...cachedVideos, ...newOrUpdatedVideos];
+
+      // Save the updated videos to the state and LocalStorage
+      setVideos(updatedVideos);
+      localStorage.setItem("videos", JSON.stringify(updatedVideos));
     } catch (err) {
       console.error("Error fetching videos:", err);
       setError(err.message || "Failed to load videos.");
@@ -55,14 +62,14 @@ const VideosPage = () => {
       <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-16 mb-12 text-white rounded-xl shadow-xl">
         <div className="max-w-5xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-4">
-          Welcome to our video dataset
+            Welcome to our video dataset
           </h1>
           <p className="text-xl mb-6 max-w-3xl mx-auto">
-          Here, you can explore a collection of
-          videos categorized into different types such as happy, sad, and more.
-          You can also contribute to this dataset by creating your own videos.
-          Simply go to create dataset in sidebar to upload and add your videos to help grow
-          the collection!
+            Here, you can explore a collection of videos categorized into
+            different types such as happy, sad, and more. You can also
+            contribute to this dataset by creating your own videos. Simply go to
+            create dataset in sidebar to upload and add your videos to help grow
+            the collection!
           </p>
         </div>
       </section>
@@ -109,6 +116,7 @@ const VideosPage = () => {
                 <video
                   className="w-full h-48 object-cover rounded-t-lg"
                   controls
+                  muted
                   src={video.url}
                 >
                   Your browser does not support the video tag.
@@ -120,7 +128,9 @@ const VideosPage = () => {
                 </h3>
                 <p className="text-blue-600 text-sm">
                   Uploaded by:{" "}
-                  <span className="font-medium">{video.username || "Anonymous"}</span>
+                  <span className="font-medium">
+                    {video.username || "Anonymous"}
+                  </span>
                 </p>
               </div>
             </div>

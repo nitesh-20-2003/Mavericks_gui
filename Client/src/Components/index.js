@@ -40,3 +40,5 @@ export { default as Stats } from "./Stats";
 export { default as CommunityFeed } from "./CommunityFeed";
 export { default as IslComponent } from "./IslComponent";
 export { default as DataSet } from "./DataSet";
+export {default as DashBlog} from './DashBlog'
+export {default as BlogGrid} from './BlogGrid';

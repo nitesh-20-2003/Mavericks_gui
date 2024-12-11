@@ -16,10 +16,13 @@ const Landing = () => {
             <span>Croudsource</span> app
           </h1>
           <p>
-            I'm baby wayfarers hoodie next level taiyaki brooklyn cliche blue
-            bottle single-origin coffee chia. Aesthetic post-ironic venmo,
-            quinoa lo-fi tote bag adaptogen everyday carry meggings +1 brunch
-            narwhal.
+            Mavericks is an innovative crowdsourced platform designed to bridge
+            the communication gap between the hearing and non-hearing
+            communities by promoting the usage and learning of Indian Sign
+            Language (ISL). The platform allows users to actively contribute,
+            learn, and interact with a wide variety of ISL content, creating an
+            engaging and supportive community that fosters accessibility,
+            inclusivity, and empowerment.
           </p>
           <Link
             to="/register"

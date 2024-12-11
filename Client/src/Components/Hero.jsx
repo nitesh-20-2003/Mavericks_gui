@@ -10,7 +10,7 @@ const Hero = () => {
     <div className="grid lg:grid-cols-2 gap-24 items-center w-[90vw] max-w-[1120px] mx-auto ">
       <div>
         <h1 className="max-w-2xl text-4xl font-bold tracking-tight sm:text-6xl text-secondary">
-          Dictionary <span className="text-neutral mx-2">Of</span> Isl
+          Dictionary <span className="text-neutral mx-2">Of</span> ISL
         </h1>
         <p className="mt-8 max-w-xl text-lg leading-8">
           Welcome to our Dictionary page, where we provide a rich collection of

@@ -49,7 +49,7 @@ const DashDictionary = () => {
           </div>
         </div>
         {/* viewall */}
-        <Link className="btn" to="/Dashboard/Datasets">
+        <Link className="btn" to="/Dashboard/Dictionary">
           <div className="flex text-center justify-end">
             <div className="flex justify-center items-center">
               <h6 className=" font-mono capitalize tracking-[-0.1rem]">

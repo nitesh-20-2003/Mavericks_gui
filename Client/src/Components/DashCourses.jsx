@@ -21,7 +21,7 @@ const DashCourses = () => {
           </div>
         </div>
         {/* viewall */}
-        <Link className="btn" to="/Dashboard/Datasets">
+        <Link className="btn" to="/dashboard/courses">
           <div className="flex text-center justify-end">
             <div className="flex justify-center items-center">
               <h6 className=" font-mono capitalize tracking-[-0.1rem]">
@@ -41,9 +41,9 @@ const DashCourses = () => {
             <h2 className="card-title">Non Manual </h2>
             <div className="text-[0.8em]">
               <p>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nulla
-                corrupti recusandae quisquam illo maiores. Obcaecati ea odit
-                nulla eos ut?
+                Non-manual features (NMFs) are critical elements of sign
+                language communication that go beyond hand gestures to convey
+                meaning. They include facial expressions, head movements, mouth
               </p>
             </div>
 
@@ -64,9 +64,9 @@ const DashCourses = () => {
             <h2 className="card-title leading-[1]">Spatial Features</h2>
             <div className="text-[0.8em]">
               <p>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nulla
-                corrupti recusandae quisquam illo maiores. Obcaecati ea odit
-                nulla eos ut?
+                Spatial features are a fundamental aspect of sign language,
+                using the space around the signer to add depth and clarity to
+                communication.
               </p>
             </div>
 
@@ -86,9 +86,9 @@ const DashCourses = () => {
             <h2 className="card-title  leading-[1]">Regional And Cultural</h2>
             <div className="text-[0.8em]">
               <p>
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nulla
-                corrupti recusandae quisquam illo maiores. Obcaecati ea odit
-                nulla eos ut?
+                Sign language is not a universal language; it reflects the
+                regional and cultural identity of its users. Regional and
+                cultural 
               </p>
             </div>
 

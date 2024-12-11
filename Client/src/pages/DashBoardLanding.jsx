@@ -1,6 +1,7 @@
 import React from "react";
 import { DashBoardHero ,Whoare,DashDatasets,DashCourses,
-  DashDicionary,DashRealTime,Footer,Stats
+  DashDicionary,DashRealTime,Footer,Stats,DashBlog,
+  BlogGrid
 } from "../Components";
 const Landing = () => {
   return (
@@ -12,6 +13,8 @@ const Landing = () => {
         <DashCourses />
         <DashDicionary />
         <DashRealTime />
+        <DashBlog />
+        <BlogGrid />
         {/* <Footer /> */}
     </div>
   );

@@ -9,9 +9,13 @@ import { IoIosBookmarks } from "react-icons/io";
 import { BsWebcamFill } from "react-icons/bs";
 import { VscGitPullRequestCreate } from "react-icons/vsc";
 import { RiVideoUploadFill } from "react-icons/ri";
+import { MdMovieCreation } from "react-icons/md";
 import { SiCoursera } from "react-icons/si";
 // import { RiUserCommunityFill } from "react-icons/ri";
+import { FaSortAlphaDown } from "react-icons/fa";
 import { SiSemanticscholar } from "react-icons/si";
+import { path } from "framer-motion/client";
+import { FaTextHeight } from "react-icons/fa";
 
 const links = [
   {
@@ -50,10 +54,25 @@ const links = [
     icon: <MdDatasetLinked />,
   },
   {
+    text: "Create Dataset",
+    path: "DataSetCreation",
+    icon:<MdMovieCreation />,
+  },
+  {
     text: "Profile",
     path: "Profile",
     icon: <ImProfile />,
   },
+  {
+    text:"Sign Interpreter",
+    path:"Sign",
+    icon:<FaSortAlphaDown />,
+  },
+  {
+    text:"text to sign",
+    path:"TextToSign",
+    icon :<FaTextHeight />,
+  }
 ];
 
 export default links;

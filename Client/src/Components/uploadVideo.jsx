@@ -147,9 +147,9 @@ const UploadVideo = () => {
           <option value="">Select Expression</option>
           <option value="happy">Happy</option>
           <option value="sad">Sad</option>
-          <option value="laugh">Laugh</option>
-          <option value="cry">Cry</option>
-          <option value="questioning">Questioning</option>
+          <option value="surprise">Surprise</option>
+          <option value="neutral">Neutral</option>
+          <option value="anger">Anger</option>
         </select>
       </motion.div>
 

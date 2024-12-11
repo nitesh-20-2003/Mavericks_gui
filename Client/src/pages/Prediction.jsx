@@ -3,8 +3,8 @@ import { io } from "socket.io-client";
 import { BiVideoRecording } from "react-icons/bi";
 import { FaCircleStop } from "react-icons/fa6";
 import axios from "axios";
-    import { toast } from "react-toastify";
-import {IslComponent} from '../Components';
+import { toast } from "react-toastify";
+import { IslComponent } from "../Components";
 const Prediction = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -55,14 +55,14 @@ const Prediction = () => {
   const startRecording = () => {
     setRecording(true);
     startWebcam();
-    
+
     // Delay to ensure the webcam initializes
     setTimeout(() => {
       const id = setInterval(processFrame, 600);
       setIntervalId(id);
     }, 1000);
   };
-  
+
   // Stop recording video frames
   const stopRecording = () => {
     toast.success("Video recording stopped succesfully !!");
@@ -74,7 +74,7 @@ const Prediction = () => {
       setIntervalId(null);
     }
 
-    setInputsDisabled(false); 
+    setInputsDisabled(false);
   };
 
   // Process individual video frames
@@ -145,18 +145,18 @@ const Prediction = () => {
   useEffect(() => {
     if (socket) {
       socket.on("frame_processed", (data) => {
-        if (data.features) {
-          // Flatten and filter the features
-          const validFeatures = data.features
-            .map(
-              (feature) =>
-                Object.entries(feature)
-                   // Filter out null values
-                  .map(([key, value]) => `${key}: ${value}`) // Map keys and values into a formatted string
-            )
-            .flat(); // Flatten the array of arrays
+        console.log(data);
 
-          setExtractedFeatures(validFeatures); // Update the ExtractedFeatures state
+        if (data.face_analysis) {
+          // Convert the face_analysis object into an array of key-value pairs
+          const faceAnalysisArray = Object.entries(data.face_analysis).map(
+            ([key, value]) => {
+              return `${key}: ${value}`;
+            }
+          );
+
+          // Update state with the flattened array of features
+          setExtractedFeatures(faceAnalysisArray);
         }
 
         if (data.error) {
@@ -174,6 +174,7 @@ const Prediction = () => {
       };
     }
   }, [socket]);
+
 
   return (
     <div className="w-[90vw] max-w-[1120px] mx-auto">
@@ -276,7 +277,7 @@ const Prediction = () => {
           </div>
         </div>
       </div>
-      <IslComponent />
+      {/* <IslComponent /> */}
     </div>
   );
 };

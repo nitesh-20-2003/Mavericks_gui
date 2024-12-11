@@ -19,3 +19,5 @@ export {default as Nmf} from './Nmf';
 export {default as Profile} from './Profile'
 export { default as Prediction } from "./Prediction";
 export {default as DataSetCreation} from './DataSetCreation';
+export {default as Sign_Alphabets} from './Sign_Alphabets';
+export {default as TextToSign} from './TextToSign';

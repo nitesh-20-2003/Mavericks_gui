@@ -45,14 +45,15 @@ export const checkForTestUser = (req, res, next) => {
 
 // Token verification middleware (for Authorization header)
 export const verifyToken = (req, res, next) => {
-  console.log("Token verification middleware called");
+  // console.log("Token verification middleware called");
 
   // Log headers to ensure the Authorization header is passed
-  console.log("Request headers:", req.headers);
+  // console.log("Request headers:", req.headers);
 
   const token = req.headers.authorization?.split(" ")[1]; // Extract token from Authorization header
 
-  console.log("Token received:", token); // Log token value for debugging
+  // console.log("Token received:", token); 
+  // Log token value for debugging
 
   if (!token) {
     return res.status(StatusCodes.UNAUTHORIZED).json({ message: "No token provided" });

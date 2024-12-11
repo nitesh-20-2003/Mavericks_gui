@@ -181,7 +181,7 @@ const DataSet = () => {
       <div className="flex items-center justify-center">
         <h2 className="font-[700] mt-6 mb-[3.5rem] capitalize font-mono text-secondary tracking-tighter">
           Live Video Recording for:{" "}
-          <span className="text-gray-800"> Dataset Training</span>
+          <span className="text-gray-800"> Model Training</span>
         </h2>
       </div>
       <div className="card lg:card-side bg-base-100 shadow-xl">

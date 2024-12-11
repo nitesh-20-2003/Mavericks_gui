@@ -21,7 +21,9 @@ import {
   Nmf,
   Profile,
   Prediction,
-  DataSetCreation
+  DataSetCreation,
+  Sign_Alphabets,
+  TextToSign,
 } from "./pages";
 // actions
 import { action as RegisterAction } from './pages/Register';
@@ -67,16 +69,24 @@ const router = createBrowserRouter([
             element: <DashBoardLanding />,
           },
           {
-            path:"DataSetCreation",
-            element:<DataSetCreation />,
+            path:"TextToSign",
+            element:<TextToSign/>,
           },
           {
-            path:"profile",
-            element:<Profile />
+            path: "Sign",
+            element: <Sign_Alphabets />,
           },
           {
-            path:"Prediction",
-            element:<Prediction />,
+            path: "DataSetCreation",
+            element: <DataSetCreation />,
+          },
+          {
+            path: "profile",
+            element: <Profile />,
+          },
+          {
+            path: "Prediction",
+            element: <Prediction />,
           },
           {
             path: "Dictionary",
@@ -86,6 +96,7 @@ const router = createBrowserRouter([
                 index: true,
                 element: <DictionaryLanding />,
               },
+
               {
                 path: "Profile",
                 element: <Profile />,
