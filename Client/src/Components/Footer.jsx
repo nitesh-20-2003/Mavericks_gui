@@ -1,4 +1,4 @@
-import { pageLinks, socialLinks } from "../utils/data";
+import { pageLinks, socialLinks } from "../utils/data.js";
 import PageLinks from "./PageLinks";
 import SocialLink from "./SocialLink";
 import Wrapper from "../assets/Wrappers/Footer";

@@ -5,24 +5,16 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-   
       "/api": {
-        target: "http://localhost:5100/api", 
-        changeOrigin: true, 
-        rewrite: (path) => path.replace(/^\/api/, ""), 
-      },
-     
-      "/video": {
-        target: "http://localhost:5000", 
+        target: "http://localhost:5100/api",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/video/, "/video"), // 
+        rewrite: (path) => path.replace(/^\/api/, ""),
       },
-     
-      "/ai": {
-        target: "http://localhost:5000", 
+      "/api/py": {
+        target: "http://localhost:5102",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ai/, "/ai"), // Optional: retain '/ai' path prefix
-      }
+        rewrite: (path) => path.replace(/^\/api\/py/, ""), // Remove /api/py prefix
+      },
     },
   },
 });

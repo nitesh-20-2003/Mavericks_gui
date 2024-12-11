@@ -1,5 +1,5 @@
 import { FaTimes } from "react-icons/fa";
-import Wrapper from "../assets/Wrappers/SmallSidebar";
+import Wrapper from "../assets/Wrappers/SmallSidebar.js";
 import NavLinks from "./Navlinks.jsx"
 import { useSelector, useDispatch } from "react-redux";
 import { toggleSidebar } from "../features/SidebarSlice.js"; 

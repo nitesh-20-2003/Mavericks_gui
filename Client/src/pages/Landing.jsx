@@ -2,7 +2,6 @@
 import { Link } from "react-router-dom";
 import {Logo } from "../Components";
 import React from 'react'
-import customFetch from "../utils/customFetch";
 import main from '../assets/images/main.svg'
 import Wrapper from "../assets/Wrappers/LandingPage";
 const Landing = () => {

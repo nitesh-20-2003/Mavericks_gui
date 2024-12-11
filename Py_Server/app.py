@@ -43,7 +43,7 @@ def process_frame(image):
         rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = holistic.process(rgb_image)
 
-        black_canvas = np.zeros((CANVAS_HEIGHT, CANVAS_WIDTH, 3), dtype=np.uint8)
+        black_canvas = np.zeros((CANVAS_WIDTH, CANVAS_HEIGHT, 3), dtype=np.uint8)
 
         # Normalize and draw landmarks
         def normalize_and_draw_landmarks(landmarks, connections):
@@ -52,7 +52,7 @@ def process_frame(image):
                     black_canvas, landmarks, connections, 
                     landmark_drawing_spec=mp_drawing_styles.get_default_face_mesh_tesselation_style()
                 )
-        
+
         # Process different body parts
         if results.face_landmarks:
             normalize_and_draw_landmarks(results.face_landmarks, mp_holistic.FACEMESH_TESSELATION)
@@ -97,13 +97,10 @@ def handle_frame(frame_data):
         results = model(canvas_pil)
 
         # Print predictions in the terminal
-        print("Predicted classifications:", results)
+        print("Predictions:", results)
 
         # Send the prediction result back to the client
-        if results:
-            emit('frame_processed', {'predictions': results[0]})
-        else:
-            emit('frame_processed', {'error': 'No predictions returned by the model.'})
+        emit('frame_processed', {'predictions': results[0]})
     except Exception as e:
         print(f"Error processing frame: {e}")
         emit('frame_processed', {'error': str(e)})
