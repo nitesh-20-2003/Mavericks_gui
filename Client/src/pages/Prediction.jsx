@@ -9,18 +9,19 @@ const Prediction = () => {
   const canvasRef = useRef(null);
   const [socket, setSocket] = useState(null);
   const [response, setResponse] = useState("Waiting for predictions...");
+  const [ExtractedFeatures, setExtractedFeatures] = useState([]);
   const [recording, setRecording] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
   const [emotionDetected, setEmotionDetected] = useState("");
   const [userInput, setUserInput] = useState("");
   const [nonManualFeatures, setNonManualFeatures] = useState([]);
   const [rewrittenSentence, setRewrittenSentence] = useState("");
-  const [loading, setLoading] = useState(false); // For disabling the button after click
-  const [selectEnabled, setSelectEnabled] = useState(false); // To enable the select component
-  const [inputsDisabled, setInputsDisabled] = useState(true); // Manage the disabled state of inputs
+  const [loading, setLoading] = useState(false);
+  const [selectEnabled, setSelectEnabled] = useState(false);
+  const [inputsDisabled, setInputsDisabled] = useState(true);
 
+  // Initialize WebSocket connection
   useEffect(() => {
-    // Initialize WebSocket connection
     const socketInstance = io("http://localhost:5000");
     setSocket(socketInstance);
 
@@ -29,6 +30,7 @@ const Prediction = () => {
     };
   }, []);
 
+  // Start webcam streaming
   const startWebcam = () => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -36,52 +38,31 @@ const Prediction = () => {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
       })
-      .catch((error) => {
-        console.error("Error accessing webcam:", error);
-      });
+      .catch((error) => console.error("Error accessing webcam:", error));
   };
 
+  // Stop webcam streaming
   const stopWebcam = () => {
     const stream = videoRef.current?.srcObject;
     if (stream) {
-      const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
       videoRef.current.srcObject = null;
     }
   };
 
+  // Start recording video frames
   const startRecording = () => {
     setRecording(true);
     startWebcam();
 
-    const processFrame = () => {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-
-      if (video.readyState === 4) {
-        const context = canvas.getContext("2d");
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        canvas.toBlob((blob) => {
-          if (blob && socket) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const base64Image = reader.result;
-              socket.emit("process_frame", base64Image);
-            };
-            reader.readAsDataURL(blob);
-          }
-        }, "image/jpeg");
-      }
-    };
-
-    const id = setInterval(processFrame, 600);
-    setIntervalId(id);
+    // Delay to ensure the webcam initializes
+    setTimeout(() => {
+      const id = setInterval(processFrame, 600);
+      setIntervalId(id);
+    }, 1000);
   };
 
+  // Stop recording video frames
   const stopRecording = () => {
     setRecording(false);
     stopWebcam();
@@ -91,12 +72,49 @@ const Prediction = () => {
       setIntervalId(null);
     }
 
-    // Enable the inputs after stop
-    setInputsDisabled(false);
+    setInputsDisabled(false); // Enable inputs after stopping
   };
 
+  // Process individual video frames
+  const processFrame = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+
+    if (!video || !canvas) {
+      console.warn("Video or Canvas is not available.");
+      return;
+    }
+
+    if (video.readyState !== 4) {
+      console.warn("Video is not ready yet.");
+      return;
+    }
+
+    const context = canvas.getContext("2d");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(
+      (blob) => {
+        if (blob && socket) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64Image = reader.result;
+            socket.emit("process_frame", base64Image);
+          };
+          reader.readAsDataURL(blob);
+        }
+      },
+      "image/jpeg",
+      0.7
+    );
+  };
+
+  // Send prediction request to the backend
   const sendPredictionRequest = async () => {
-    setLoading(true); // Disable the button on click
+    setLoading(true);
     try {
       const response = await axios.post(
         "http://localhost:5102/api/py/generate",
@@ -107,34 +125,43 @@ const Prediction = () => {
       );
 
       const data = response.data;
-
-      // Update non-manual features in the select dropdown
       const features = data.non_manual_features
         .filter((line) => line.startsWith("*"))
         .map((line) => line.replace("*", "").trim());
 
       setNonManualFeatures(features);
       setRewrittenSentence(data.rewritten_sentence);
-
-      // Enable the select component after the API response
-      setSelectEnabled(true);
+      setSelectEnabled(true); // Enable the select dropdown
     } catch (error) {
       console.error("Error making POST request:", error);
     } finally {
-      setLoading(false); // Re-enable the button
+      setLoading(false);
     }
   };
 
+  // Handle socket events
   useEffect(() => {
     if (socket) {
       socket.on("frame_processed", (data) => {
-        console.log("Received data from server:", data);
+        if (data.features) {
+          // Flatten and filter the features
+          const validFeatures = data.features
+            .map(
+              (feature) =>
+                Object.entries(feature)
+                   // Filter out null values
+                  .map(([key, value]) => `${key}: ${value}`) // Map keys and values into a formatted string
+            )
+            .flat(); // Flatten the array of arrays
+
+          setExtractedFeatures(validFeatures); // Update the ExtractedFeatures state
+        }
 
         if (data.error) {
           setResponse(`Error: ${data.error}`);
         } else if (data.predictions) {
           setEmotionDetected(data.predictions.label);
-          setResponse(data.predictions.label); // Show detected emotion
+          setResponse(data.predictions.label);
         } else {
           setResponse("Unexpected response from server.");
         }
@@ -161,91 +188,89 @@ const Prediction = () => {
         </figure>
         <div className="card-body">
           <label className="form-control w-full max-w-xs">
-            <div className="font-baloo">
-              <select
-                className="select select-bordered w-full max-w-xs"
-                disabled={!selectEnabled} // Enable the select after API response
+            {/* <select
+              className="select select-bordered w-full max-w-xs font-baloo"
+              disabled={!ExtractedFeatures.length}
+              size={ExtractedFeatures.length || 5} // Set a higher default value for the size
+              style={{ maxHeight: "none" }} // Ensure no limit to the height of the dropdown
+            >
+              <option disabled selected>
+                Landmark Detection Mediapipe..
+              </option>
+              {ExtractedFeatures.map((feature, index) => (
+                <option key={index}>{feature}</option>
+              ))}
+            </select> */}
+            <select
+              className="select select-bordered select-md w-full max-w-xs h-[12rem]"
+              size={ExtractedFeatures.length || 5} // Adjust this number to show all items
+              style={{ maxHeight: "none", overflow: "visible" }} // Ensure no vertical scroll
+              disabled={!ExtractedFeatures.length}
+            >
+              <option disabled selected>
+                Landmark Detection Mediapipe..
+              </option>
+              {ExtractedFeatures.map((feature, index) => (
+                <option key={index}>{feature}</option>
+              ))}
+            </select>
+          </label>
+          <div className="mt-45">
+            <label className="form-control w-full max-w-xs">
+              <input
+                type="text"
+                value={emotionDetected}
+                placeholder="Detected Emotion"
+                className="input input-bordered"
+                readOnly
+              />
+            </label>
+
+            <label className="form-control w-full max-w-xs mt-7">
+              <input
+                type="text"
+                placeholder="Enter your string"
+                className="input input-bordered"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                disabled={inputsDisabled}
+              />
+            </label>
+
+            <label className="form-control w-full max-w-xs mt-7">
+              <input
+                type="text"
+                value={rewrittenSentence}
+                placeholder="String from GenAI"
+                className="input input-bordered"
+                readOnly
+                disabled={inputsDisabled}
+              />
+            </label>
+
+            <div className="card-actions justify-between mt-6">
+              <button
+                className="btn btn-outline"
+                onClick={startRecording}
+                disabled={recording}
               >
-                <option disabled selected>
-                  Nmf emotion detected
-                </option>
-                {nonManualFeatures.map((feature, index) => (
-                  <option key={index}>{feature}</option>
-                ))}
-              </select>
+                Start <BiVideoRecording />
+              </button>
+              <button
+                className="btn btn-outline"
+                onClick={stopRecording}
+                disabled={!recording}
+              >
+                Stop <FaCircleStop />
+              </button>
+              <button
+                className="btn btn-outline"
+                onClick={sendPredictionRequest}
+                disabled={loading || !emotionDetected || !userInput}
+              >
+                {loading ? "Sending..." : "Send to GenAI"}
+              </button>
             </div>
-
-            <div className="label">
-              <span className="label-text font-bold font-baloo text-xl">
-                Emotion detected
-              </span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              value={emotionDetected}
-              className="input input-bordered w-full max-w-xs "
-              readOnly
-            />
-          </label>
-
-          {/* Enter your string */}
-          <label className="form-control w-full max-w-xs">
-            <div className="label">
-              <span className="label-text font-bold text-xl font-baloo">
-                Enter your string
-              </span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              className="input input-bordered w-full max-w-xs"
-              value={userInput}
-              onChange={(e) => setUserInput(e.target.value)}
-              disabled={inputsDisabled} // Initially disabled
-            />
-          </label>
-
-          {/* Your predicted string */}
-          <label className="form-control w-full max-w-xs">
-            <div className="label">
-              <span className="label-text font-bold text-xl font-baloo">
-                String From GenAi
-              </span>
-            </div>
-            <input
-              type="text"
-              placeholder="Type here"
-              value={rewrittenSentence}
-              className="input input-bordered input-lg w-full max-w-xs"
-              readOnly
-              disabled={inputsDisabled} // Initially disabled
-            />
-          </label>
-
-          <div className="card-actions justify-between mt-6">
-            <button
-              className="btn btn-outline"
-              onClick={startRecording}
-              disabled={recording}
-            >
-              Start <BiVideoRecording />
-            </button>
-            <button
-              className="btn btn-outline"
-              onClick={stopRecording}
-              disabled={!recording}
-            >
-              Stop <FaCircleStop />
-            </button>
-            {/* Send button disabled while loading */}
-            <button
-              className="btn btn-outline"
-              onClick={sendPredictionRequest}
-              disabled={loading || !emotionDetected || !userInput} // Disable when loading or missing inputs
-            >
-              {loading ? "Sending..." : "Send to GenAi"}
-            </button>
           </div>
         </div>
       </div>
