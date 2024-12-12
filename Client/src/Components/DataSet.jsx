@@ -4,7 +4,7 @@ import { BiVideoRecording } from "react-icons/bi";
 import { FaCircleStop } from "react-icons/fa6";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { IslComponent } from ".";
+
 const DataSet = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -14,14 +14,16 @@ const DataSet = () => {
   const [recording, setRecording] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
   const [emotionDetected, setEmotionDetected] = useState("");
+  const [wordDetected, setWordDetected] = useState("");
   const [userInput, setUserInput] = useState("");
   const [nonManualFeatures, setNonManualFeatures] = useState([]);
   const [rewrittenSentence, setRewrittenSentence] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectEnabled, setSelectEnabled] = useState(false);
   const [inputsDisabled, setInputsDisabled] = useState(true);
+  const [ISL, setISL] = useState(false);
+  const [displayType, setDisplayType] = useState("emotion"); // 'emotion' or 'word'
 
-  // Initialize WebSocket connection
   useEffect(() => {
     const socketInstance = io("http://localhost:5000");
     setSocket(socketInstance);
@@ -30,7 +32,6 @@ const DataSet = () => {
       socketInstance.disconnect();
     };
   }, []);
-
 
   const startWebcam = () => {
     navigator.mediaDevices
@@ -42,7 +43,6 @@ const DataSet = () => {
       .catch((error) => console.error("Error accessing webcam:", error));
   };
 
-  // Stop webcam streaming
   const stopWebcam = () => {
     const stream = videoRef.current?.srcObject;
     if (stream) {
@@ -51,22 +51,18 @@ const DataSet = () => {
     }
   };
 
-  // Start recording video frames
   const startRecording = () => {
     setRecording(true);
     startWebcam();
 
-    // Delay to ensure the webcam initializes
     setTimeout(() => {
-      const id = setInterval(processFrame, 600);
+      const id = setInterval(processFrame, 550);
       setIntervalId(id);
     }, 1000);
   };
 
-  // Stop recording video frames
   const stopRecording = () => {
-   toast.success("We appreciate your contributions! 🤗");
-
+    toast.success("Thank you for your contribution!");
     setRecording(false);
     stopWebcam();
 
@@ -78,7 +74,6 @@ const DataSet = () => {
     setInputsDisabled(false);
   };
 
-  // Process individual video frames
   const processFrame = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -115,7 +110,6 @@ const DataSet = () => {
     );
   };
 
-  // Send prediction request to the backend
   const sendPredictionRequest = async () => {
     setLoading(true);
     try {
@@ -134,7 +128,7 @@ const DataSet = () => {
 
       setNonManualFeatures(features);
       setRewrittenSentence(data.rewritten_sentence);
-      setSelectEnabled(true); // Enable the select dropdown
+      setSelectEnabled(true);
     } catch (error) {
       console.error("Error making POST request:", error);
     } finally {
@@ -142,22 +136,15 @@ const DataSet = () => {
     }
   };
 
-  // Handle socket events
   useEffect(() => {
     if (socket) {
       socket.on("frame_processed", (data) => {
-        if (data.features) {
-          // Flatten and filter the features
-          const validFeatures = data.features
-            .map(
-              (feature) =>
-                Object.entries(feature)
-                  // Filter out null values
-                  .map(([key, value]) => `${key}: ${value}`)
-            )
-            .flat(); 
+        if (data.face_analysis) {
+          const faceAnalysisArray = Object.entries(data.face_analysis).map(
+            ([key, value]) => `${key}: ${value}`
+          );
 
-          setExtractedFeatures(validFeatures); 
+          setExtractedFeatures(faceAnalysisArray);
         }
 
         if (data.error) {
@@ -165,8 +152,10 @@ const DataSet = () => {
         } else if (data.predictions) {
           setEmotionDetected(data.predictions.label);
           setResponse(data.predictions.label);
-        } else {
-          setResponse("Unexpected response from server.");
+        }
+
+        if (data.predictions2) {
+          setWordDetected(data.predictions2.label);
         }
       });
 
@@ -177,67 +166,36 @@ const DataSet = () => {
   }, [socket]);
 
   return (
-    <div className="w-[90vw] max-w-[1120px] mx-auto">
-      <div className="flex items-center justify-center">
-        <h2 className="font-[700] mt-6 mb-[3.5rem] capitalize font-mono text-secondary tracking-tighter">
-          Live Video Recording for:{" "}
-          <span className="text-gray-800"> Model Training</span>
-        </h2>
-      </div>
-      <div className="card lg:card-side bg-base-100 shadow-xl">
-        <figure>
-          <video ref={videoRef} />
+    <div className=" h-[70vh] flex flex-col items-center   max-w-[1120px] mx-auto ">
+      <h2 className="font-[800] mt-6 mb-4  font-mono text-secondary text-2xl capitalize">
+        Progressive Learning :
+        <span className="text-gray-800">AI Model</span>
+      </h2>
+      <div className="card lg:card-side bg-base-100 shadow-xl w-full h-full flex">
+        <figure className="flex-1 flex justify-center items-center">
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+          />
           <canvas ref={canvasRef} style={{ display: "none" }} />
         </figure>
-        <div className="card-body">
-          <label className="form-control w-full max-w-xs">
-            <select
-              className="select select-bordered select-md w-full max-w-xs h-[12rem]"
-              size={ExtractedFeatures.length || 5} // Adjust this number to show all items
-              style={{ maxHeight: "none", overflow: "visible" }} // Ensure no vertical scroll
-              disabled={!ExtractedFeatures.length}
-            >
-              <option disabled selected>
-                Landmark Detection Mediapipe..
-              </option>
-              {ExtractedFeatures.map((feature, index) => (
-                <option key={index}>{feature}</option>
-              ))}
-            </select>
-          </label>
-          <div className="mt-60">
-            {/* <label className="form-control w-full max-w-xs">
-              <input
-                type="text"
-                value={emotionDetected}
-                placeholder="Detected Emotion"
-                className="input input-bordered"
-                readOnly
-              />
-            </label> */}
-
-            {/* <label className="form-control w-full max-w-xs mt-7">
-              <input
-                type="text"
-                placeholder="Enter your string"
-                className="input input-bordered"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                disabled={inputsDisabled}
-              />
-            </label>
-
-            <label className="form-control w-full max-w-xs mt-7">
-              <input
-                type="text"
-                value={rewrittenSentence}
-                placeholder="String from GenAI"
-                className="input input-bordered"
-                readOnly
-                disabled={inputsDisabled}
-              />
-            </label> */}
-
+        <div className="card-body flex-1 overflow-y-auto">
+          <div className="mt-5">
+            <div className="">
+              <ul className="list-disc pl-6">
+                {ExtractedFeatures.map((feature, index) => (
+                  <li key={index} className="text-sm text-gray-700">
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            <div className="flex gap-4 mt-5">
+              
+            </div>
             <div className="card-actions justify-between mt-6">
               <button
                 className="btn btn-outline"
@@ -253,6 +211,7 @@ const DataSet = () => {
               >
                 Stop <FaCircleStop />
               </button>
+             
             </div>
           </div>
         </div>

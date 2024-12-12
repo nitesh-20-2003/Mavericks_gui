@@ -8,7 +8,8 @@ import { toast } from "react-toastify";
 const Prediction = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [socket, setSocket] = useState(null);
+  const [socket5000, setSocket5000] = useState(null);
+  const [socket5103, setSocket5103] = useState(null);
   const [response, setResponse] = useState("Waiting for predictions...");
   const [ExtractedFeatures, setExtractedFeatures] = useState([]);
   const [recording, setRecording] = useState(false);
@@ -19,20 +20,20 @@ const Prediction = () => {
   const [nonManualFeatures, setNonManualFeatures] = useState([]);
   const [rewrittenSentence, setRewrittenSentence] = useState("");
   const [loading, setLoading] = useState(false);
-  const [selectEnabled, setSelectEnabled] = useState(false);
   const [inputsDisabled, setInputsDisabled] = useState(true);
 
-  // Initialize WebSocket connection
   useEffect(() => {
-    const socketInstance = io("http://localhost:5000");
-    setSocket(socketInstance);
+    const socketInstance5000 = io("http://localhost:5000");
+    const socketInstance5103 = io("http://localhost:5103");
+    setSocket5000(socketInstance5000);
+    setSocket5103(socketInstance5103);
 
     return () => {
-      socketInstance.disconnect();
+      socketInstance5000.disconnect();
+      socketInstance5103.disconnect();
     };
   }, []);
 
-  // Start webcam streaming
   const startWebcam = () => {
     navigator.mediaDevices
       .getUserMedia({ video: true })
@@ -43,7 +44,6 @@ const Prediction = () => {
       .catch((error) => console.error("Error accessing webcam:", error));
   };
 
-  // Stop webcam streaming
   const stopWebcam = () => {
     const stream = videoRef.current?.srcObject;
     if (stream) {
@@ -52,18 +52,16 @@ const Prediction = () => {
     }
   };
 
-  // Start recording video frames
   const startRecording = () => {
     setRecording(true);
     startWebcam();
 
     setTimeout(() => {
-      const id = setInterval(processFrame, 600);
+      const id = setInterval(processFrame, 550);
       setIntervalId(id);
     }, 1000);
   };
 
-  // Stop recording video frames
   const stopRecording = () => {
     toast.success("Video recording stopped successfully!");
     setRecording(false);
@@ -77,7 +75,6 @@ const Prediction = () => {
     setInputsDisabled(false);
   };
 
-  // Process individual video frames
   const processFrame = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -100,11 +97,12 @@ const Prediction = () => {
 
     canvas.toBlob(
       (blob) => {
-        if (blob && socket) {
+        if (blob) {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64Image = reader.result;
-            socket.emit("process_frame", base64Image);
+            if (socket5000) socket5000.emit("process_frame", base64Image);
+            if (socket5103) socket5103.emit("process_frame", base64Image);
           };
           reader.readAsDataURL(blob);
         }
@@ -114,14 +112,16 @@ const Prediction = () => {
     );
   };
 
-  // Send prediction request to the backend
   const sendPredictionRequest = async () => {
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5102/api/py/generate", {
-        sentence: userInput,
-        emotion: emotionDetected,
-      });
+      const response = await axios.post(
+        "http://localhost:5102/api/py/generate",
+        {
+          sentence: userInput,
+          emotion: emotionDetected,
+        }
+      );
 
       const data = response.data;
       const features = data.non_manual_features
@@ -130,7 +130,6 @@ const Prediction = () => {
 
       setNonManualFeatures(features);
       setRewrittenSentence(data.rewritten_sentence);
-      setSelectEnabled(true);
     } catch (error) {
       console.error("Error making POST request:", error);
     } finally {
@@ -138,10 +137,9 @@ const Prediction = () => {
     }
   };
 
-  // Handle socket events
   useEffect(() => {
-    if (socket) {
-      socket.on("frame_processed", (data) => {
+    if (socket5000) {
+      socket5000.on("frame_processed", (data) => {
         if (data.face_analysis) {
           const faceAnalysisArray = Object.entries(data.face_analysis).map(
             ([key, value]) => `${key}: ${value}`
@@ -156,47 +154,52 @@ const Prediction = () => {
           setEmotionDetected(data.predictions.label);
           setResponse(data.predictions.label);
         }
+      });
+    }
 
+    if (socket5103) {
+      socket5103.on("frame_processed", (data) => {
         if (data.predictions2) {
           setWordDetected(data.predictions2.label);
         }
       });
-
-      return () => {
-        socket.off("frame_processed");
-      };
     }
-  }, [socket]);
+
+    return () => {
+      if (socket5000) socket5000.off("frame_processed");
+      if (socket5103) socket5103.off("frame_processed");
+    };
+  }, [socket5000, socket5103]);
 
   return (
-    <div className="w-[90vw] max-w-[1120px] mx-auto">
-      <div className="flex items-center justify-center">
-        <h2 className="font-[800] mt-6 mb-[3.5rem] capitalize font-mono text-secondary">
-          Language that evokes Feelings: <span className="text-gray-800">ISL</span>
-        </h2>
-      </div>
-      <div className="card lg:card-side bg-base-100 shadow-xl">
-        <figure>
-          <video ref={videoRef} />
+    <div className="h-[80vh] flex flex-col items-center w-[70vw]  mx-auto card shadow-2xl">
+      <h2 className="font-[800] mt-6 mb-4 capitalize font-mono text-secondary text-2xl">
+        Language that evokes Feelings:{" "}
+        <span className="text-gray-800">ISL</span>
+      </h2>
+      <div className="card lg:card-side bg-base-100 shadow-xl w-full h-full flex">
+        <figure className="flex-1 flex justify-center items-center w-[100%] mx-auto ">
+          <video
+            ref={videoRef}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+          />
           <canvas ref={canvasRef} style={{ display: "none" }} />
         </figure>
-        <div className="card-body">
-          <label className="form-control w-full max-w-xs">
-            <select
-              className="select select-bordered select-md w-full max-w-xs h-[12rem]"
-              size={ExtractedFeatures.length || 5}
-              style={{ maxHeight: "none", overflow: "visible" }}
-              disabled={!ExtractedFeatures.length}
-            >
-              <option disabled selected>
-                NMF Parameters...
-              </option>
-              {ExtractedFeatures.map((feature, index) => (
-                <option key={index}>{feature}</option>
-              ))}
-            </select>
-          </label>
-          <div className="mt-45">
+
+        <div className="card-body flex-1 overflow-y-auto ">
+          <div className="mt-5">
+            <div className="">
+              <h3 className="font-bold mb-2 font-mono">NMF Parameters:</h3>
+              <ul className="list-disc pl-6">
+                {ExtractedFeatures.map((feature, index) => (
+                  <li key={index} className="text-sm text-gray-700">
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
             <label className="form-control w-full max-w-xs">
               <input
                 type="text"
@@ -206,7 +209,7 @@ const Prediction = () => {
                 readOnly
               />
             </label>
-            <label className="form-control w-full max-w-xs mt-5">
+            <label className="form-control w-full max-w-xs mt-4">
               <input
                 type="text"
                 value={wordDetected}
@@ -215,52 +218,66 @@ const Prediction = () => {
                 readOnly
               />
             </label>
-
-            <label className="form-control w-full max-w-xs mt-7">
+          </div>
+          <div className="mt-6">
+            <label className="form-control w-full max-w-xs">
+              <span className="label-text font-bold">User Input:</span>
               <input
                 type="text"
-                placeholder="Enter your string"
-                className="input input-bordered"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                disabled={inputsDisabled}
-              />
-            </label>
-
-            <label className="form-control w-full max-w-xs mt-7">
-              <input
-                type="text"
-                value={rewrittenSentence}
-                placeholder="String from GenAI"
+                placeholder="Enter a sentence for ISL translation"
                 className="input input-bordered"
-                readOnly
                 disabled={inputsDisabled}
               />
             </label>
-
-            <div className="card-actions justify-between mt-6">
-              <button
-                className="btn btn-outline"
-                onClick={startRecording}
-                disabled={recording}
-              >
-                Start <BiVideoRecording />
-              </button>
-                            <button
-                className="btn btn-outline"
-                onClick={stopRecording}
-                disabled={!recording}
-              >
-                Stop <FaCircleStop />
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={sendPredictionRequest}
-                disabled={loading || inputsDisabled}
-              >
-                {loading ? "Processing..." : "Submit"}
-              </button>
-            </div>
+            <button
+              className={`btn btn-primary mt-4 ${loading ? "loading" : ""}`}
+              onClick={sendPredictionRequest}
+              disabled={loading || inputsDisabled}
+            >
+              {loading ? "Processing..." : "Generate ISL Translation"}
+            </button>
+            {rewrittenSentence && (
+              <div className="mt-4">
+                <h3 className="font-bold">Rewritten Sentence:</h3>
+                <p className="text-gray-700">{rewrittenSentence}</p>
+              </div>
+            )}
+            {nonManualFeatures.length > 0 && (
+              <div className="mt-4">
+                <h3 className="font-bold">Non-Manual Features:</h3>
+                <ul className="list-disc pl-6">
+                  {nonManualFeatures.map((feature, index) => (
+                    <li key={index} className="text-sm text-gray-700">
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <div className="mt-6 flex gap-4">
+            <button
+              className={`btn ${
+                recording
+                  ? "btn btn-outline btn-primary"
+                  : "btn btn-outline btn-secondary"
+              }`}
+              onClick={recording ? stopRecording : startRecording}
+            >
+              {recording ? (
+                <>
+                  <FaCircleStop className="mr-2" />
+                  Stop Recording
+                </>
+              ) : (
+                <>
+                  <BiVideoRecording className="mr-2" />
+                  Start Recording
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>
@@ -269,4 +286,3 @@ const Prediction = () => {
 };
 
 export default Prediction;
-

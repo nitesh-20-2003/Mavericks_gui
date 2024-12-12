@@ -13,7 +13,6 @@ from PIL import Image
 from threading import Lock
 import csv
 import time
-
 # Initialize Flask app and enable CORS
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
@@ -23,9 +22,8 @@ socketio = SocketIO(app, cors_allowed_origins="http://localhost:5173")
 
 # Load Hugging Face model
 print("Loading Hugging Face model...")
-model = pipeline("image-classification", model="parasahuja23/vit-base-patch16-224-in21k-finetuned-final-3.0")
-# model2=pipeline("image-classification", model="parasahuja23/vit-base-patch16-224-in21k-ISL-2.0_final_on_new_words")
-# print("Model loaded successfully!")
+model2=pipeline("image-classification", model="parasahuja23/vit-base-patch16-224-in21k-ISL-2.0_final_on_new_words")
+print("Model loaded successfully!")
 
 # MediaPipe setup
 mp_holistic = mp.solutions.holistic
@@ -184,13 +182,13 @@ def handle_frame(frame_data):
         canvas_pil = Image.fromarray(cv2.cvtColor(processed_canvas, cv2.COLOR_BGR2RGB)).resize((224, 224))
 
         # Use the Hugging Face model
-        predictions = model(canvas_pil)
-        # predictions2=model2(canvas_pil) 
+        # predictions = model(canvas_pil)
+        predictions2=model2(canvas_pil) 
 
         response_data = {
-            "predictions": predictions[0],
-            # "predictions2": predictions2[0],
-            "face_analysis": face_analysis_result if face_analysis_result else None
+            # "predictions": predictions[0],
+            "predictions2": predictions2[0],
+            # "face_analysis": face_analysis_result if face_analysis_result else None
         }
 
         emit('frame_processed', response_data)
