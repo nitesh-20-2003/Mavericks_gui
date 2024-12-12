@@ -24,6 +24,7 @@ socketio = SocketIO(app, cors_allowed_origins="http://localhost:5173")
 # Load Hugging Face model
 print("Loading Hugging Face model...")
 model = pipeline("image-classification", model="parasahuja23/vit-base-patch16-224-in21k-finetuned-final-3.0")
+model2=pipeline("image-classification", model="parasahuja23/vit-base-patch16-224-in21k-ISL-2.0_final_on_new_words")
 print("Model loaded successfully!")
 
 # MediaPipe setup
@@ -184,9 +185,11 @@ def handle_frame(frame_data):
 
         # Use the Hugging Face model
         predictions = model(canvas_pil)
+        predictions2=model2(canvas_pil) 
 
         response_data = {
             "predictions": predictions[0],
+            "predictions2": predictions2[0],
             "face_analysis": face_analysis_result if face_analysis_result else None
         }
 

@@ -4,7 +4,7 @@ import { BiVideoRecording } from "react-icons/bi";
 import { FaCircleStop } from "react-icons/fa6";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { IslComponent } from "../Components";
+
 const Prediction = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -14,6 +14,7 @@ const Prediction = () => {
   const [recording, setRecording] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
   const [emotionDetected, setEmotionDetected] = useState("");
+  const [wordDetected, setWordDetected] = useState("");
   const [userInput, setUserInput] = useState("");
   const [nonManualFeatures, setNonManualFeatures] = useState([]);
   const [rewrittenSentence, setRewrittenSentence] = useState("");
@@ -56,7 +57,6 @@ const Prediction = () => {
     setRecording(true);
     startWebcam();
 
-    // Delay to ensure the webcam initializes
     setTimeout(() => {
       const id = setInterval(processFrame, 600);
       setIntervalId(id);
@@ -65,7 +65,7 @@ const Prediction = () => {
 
   // Stop recording video frames
   const stopRecording = () => {
-    toast.success("Video recording stopped succesfully !!");
+    toast.success("Video recording stopped successfully!");
     setRecording(false);
     stopWebcam();
 
@@ -118,13 +118,10 @@ const Prediction = () => {
   const sendPredictionRequest = async () => {
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5102/api/py/generate",
-        {
-          sentence: userInput,
-          emotion: emotionDetected,
-        }
-      );
+      const response = await axios.post("http://localhost:5102/api/py/generate", {
+        sentence: userInput,
+        emotion: emotionDetected,
+      });
 
       const data = response.data;
       const features = data.non_manual_features
@@ -133,7 +130,7 @@ const Prediction = () => {
 
       setNonManualFeatures(features);
       setRewrittenSentence(data.rewritten_sentence);
-      setSelectEnabled(true); // Enable the select dropdown
+      setSelectEnabled(true);
     } catch (error) {
       console.error("Error making POST request:", error);
     } finally {
@@ -145,17 +142,11 @@ const Prediction = () => {
   useEffect(() => {
     if (socket) {
       socket.on("frame_processed", (data) => {
-        console.log(data);
-
         if (data.face_analysis) {
-          // Convert the face_analysis object into an array of key-value pairs
           const faceAnalysisArray = Object.entries(data.face_analysis).map(
-            ([key, value]) => {
-              return `${key}: ${value}`;
-            }
+            ([key, value]) => `${key}: ${value}`
           );
 
-          // Update state with the flattened array of features
           setExtractedFeatures(faceAnalysisArray);
         }
 
@@ -164,8 +155,10 @@ const Prediction = () => {
         } else if (data.predictions) {
           setEmotionDetected(data.predictions.label);
           setResponse(data.predictions.label);
-        } else {
-          setResponse("Unexpected response from server.");
+        }
+
+        if (data.predictions2) {
+          setWordDetected(data.predictions2.label);
         }
       });
 
@@ -175,13 +168,11 @@ const Prediction = () => {
     }
   }, [socket]);
 
-
   return (
     <div className="w-[90vw] max-w-[1120px] mx-auto">
       <div className="flex items-center justify-center">
         <h2 className="font-[800] mt-6 mb-[3.5rem] capitalize font-mono text-secondary">
-          Language that evokes Feelings:{" "}
-          <span className="text-gray-800">ISL</span>
+          Language that evokes Feelings: <span className="text-gray-800">ISL</span>
         </h2>
       </div>
       <div className="card lg:card-side bg-base-100 shadow-xl">
@@ -191,27 +182,14 @@ const Prediction = () => {
         </figure>
         <div className="card-body">
           <label className="form-control w-full max-w-xs">
-            {/* <select
-              className="select select-bordered w-full max-w-xs font-baloo"
-              disabled={!ExtractedFeatures.length}
-              size={ExtractedFeatures.length || 5} // Set a higher default value for the size
-              style={{ maxHeight: "none" }} // Ensure no limit to the height of the dropdown
-            >
-              <option disabled selected>
-                Landmark Detection Mediapipe..
-              </option>
-              {ExtractedFeatures.map((feature, index) => (
-                <option key={index}>{feature}</option>
-              ))}
-            </select> */}
             <select
               className="select select-bordered select-md w-full max-w-xs h-[12rem]"
-              size={ExtractedFeatures.length || 5} // Adjust this number to show all items
-              style={{ maxHeight: "none", overflow: "visible" }} // Ensure no vertical scroll
+              size={ExtractedFeatures.length || 5}
+              style={{ maxHeight: "none", overflow: "visible" }}
               disabled={!ExtractedFeatures.length}
             >
               <option disabled selected>
-                Landmark Detection Mediapipe..
+                NMF Parameters...
               </option>
               {ExtractedFeatures.map((feature, index) => (
                 <option key={index}>{feature}</option>
@@ -224,6 +202,15 @@ const Prediction = () => {
                 type="text"
                 value={emotionDetected}
                 placeholder="Detected Emotion"
+                className="input input-bordered"
+                readOnly
+              />
+            </label>
+            <label className="form-control w-full max-w-xs mt-5">
+              <input
+                type="text"
+                value={wordDetected}
+                placeholder="ISL Sentence"
                 className="input input-bordered"
                 readOnly
               />
@@ -259,7 +246,7 @@ const Prediction = () => {
               >
                 Start <BiVideoRecording />
               </button>
-              <button
+                            <button
                 className="btn btn-outline"
                 onClick={stopRecording}
                 disabled={!recording}
@@ -267,19 +254,19 @@ const Prediction = () => {
                 Stop <FaCircleStop />
               </button>
               <button
-                className="btn btn-outline"
+                className="btn btn-primary"
                 onClick={sendPredictionRequest}
-                disabled={loading || !emotionDetected || !userInput}
+                disabled={loading || inputsDisabled}
               >
-                {loading ? "Sending..." : "Send to GenAI"}
+                {loading ? "Processing..." : "Submit"}
               </button>
             </div>
           </div>
         </div>
       </div>
-      {/* <IslComponent /> */}
     </div>
   );
 };
 
 export default Prediction;
+
