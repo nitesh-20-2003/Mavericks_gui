@@ -15,12 +15,13 @@ const Prediction = () => {
   const [recording, setRecording] = useState(false);
   const [intervalId, setIntervalId] = useState(null);
   const [emotionDetected, setEmotionDetected] = useState("");
-  const [wordDetected, setWordDetected] = useState("");
-  const [userInput, setUserInput] = useState("");
   const [nonManualFeatures, setNonManualFeatures] = useState([]);
   const [rewrittenSentence, setRewrittenSentence] = useState("");
   const [loading, setLoading] = useState(false);
-  const [inputsDisabled, setInputsDisabled] = useState(true);
+  const [inputsDisabled, setInputsDisabled] = useState(false); // Disable inputs initially
+  const [translatedSentence, setTranslatedSentence] = useState("");
+  const [uniqueWords, setUniqueWords] = useState(new Set());
+  const [sending, setSending] = useState(false); // New state for tracking sending process
 
   useEffect(() => {
     const socketInstance5000 = io("http://localhost:5000");
@@ -55,39 +56,26 @@ const Prediction = () => {
   const startRecording = () => {
     setRecording(true);
     startWebcam();
-
-    setTimeout(() => {
-      const id = setInterval(processFrame, 550);
-      setIntervalId(id);
-    }, 1000);
+    const id = setInterval(processFrame, 500);
+    setIntervalId(id);
   };
 
   const stopRecording = () => {
+    setSending(true); // Start sending message when stopping
     toast.success("Video recording stopped successfully!");
     setRecording(false);
     stopWebcam();
-
-    if (intervalId) {
-      clearInterval(intervalId);
-      setIntervalId(null);
-    }
-
-    setInputsDisabled(false);
+    if (intervalId) clearInterval(intervalId);
+    setIntervalId(null);
+    setInputsDisabled(false); // Enable inputs after stopping recording
+    sendPredictionRequest(); // Send the ISL sentence generated
   };
 
   const processFrame = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
-    if (!video || !canvas) {
-      console.warn("Video or Canvas is not available.");
-      return;
-    }
-
-    if (video.readyState !== 4) {
-      console.warn("Video is not ready yet.");
-      return;
-    }
+    if (!video || !canvas || video.readyState !== 4) return;
 
     const context = canvas.getContext("2d");
     canvas.width = video.videoWidth;
@@ -101,8 +89,8 @@ const Prediction = () => {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64Image = reader.result;
-            if (socket5000) socket5000.emit("process_frame", base64Image);
-            if (socket5103) socket5103.emit("process_frame", base64Image);
+            socket5000?.emit("process_frame", base64Image);
+            socket5103?.emit("process_frame", base64Image);
           };
           reader.readAsDataURL(blob);
         }
@@ -113,72 +101,83 @@ const Prediction = () => {
   };
 
   const sendPredictionRequest = async () => {
-    setLoading(true);
     try {
+      const generatedISLSentence = Array.from(uniqueWords).join(" ");
       const response = await axios.post(
         "http://localhost:5102/api/py/generate",
         {
-          sentence: userInput,
+          sentence: generatedISLSentence,
           emotion: emotionDetected,
         }
       );
-
       const data = response.data;
       const features = data.non_manual_features
         .filter((line) => line.startsWith("*"))
         .map((line) => line.replace("*", "").trim());
-
       setNonManualFeatures(features);
       setRewrittenSentence(data.rewritten_sentence);
+      setSending(false); // Stop sending message once response is received
     } catch (error) {
       console.error("Error making POST request:", error);
+      setSending(false);
+    }
+  };
+
+  const sendTranslationRequest = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        "http://localhost:5102/api/py/translate",
+        {
+          sentence: rewrittenSentence,
+        }
+      );
+      setTranslatedSentence(
+        response.data.translated_sentence || "Translation failed."
+      );
+    } catch (error) {
+      console.error("Error during translation request:", error);
+      setTranslatedSentence("Error during translation.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (socket5000) {
-      socket5000.on("frame_processed", (data) => {
-        if (data.face_analysis) {
-          const faceAnalysisArray = Object.entries(data.face_analysis).map(
-            ([key, value]) => `${key}: ${value}`
-          );
+    socket5000?.on("frame_processed", (data) => {
+      if (data.face_analysis) {
+        const faceAnalysisArray = Object.entries(data.face_analysis).map(
+          ([key, value]) => `${key}: ${value}`
+        );
+        setExtractedFeatures(faceAnalysisArray);
+      }
+      if (data.predictions) {
+        setEmotionDetected(data.predictions.label);
+        setResponse(data.predictions.label);
+      }
+    });
 
-          setExtractedFeatures(faceAnalysisArray);
-        }
-
-        if (data.error) {
-          setResponse(`Error: ${data.error}`);
-        } else if (data.predictions) {
-          setEmotionDetected(data.predictions.label);
-          setResponse(data.predictions.label);
-        }
-      });
-    }
-
-    if (socket5103) {
-      socket5103.on("frame_processed", (data) => {
-        if (data.predictions2) {
-          setWordDetected(data.predictions2.label);
-        }
-      });
-    }
+    socket5103?.on("frame_processed", (data) => {
+      if (data.predictions2) {
+        const newWord = data.predictions2.label;
+        setUniqueWords((prevWords) => new Set(prevWords.add(newWord)));
+      }
+    });
 
     return () => {
-      if (socket5000) socket5000.off("frame_processed");
-      if (socket5103) socket5103.off("frame_processed");
+      socket5000?.off("frame_processed");
+      socket5103?.off("frame_processed");
     };
   }, [socket5000, socket5103]);
 
   return (
-    <div className="h-[80vh] flex flex-col items-center w-[70vw]  mx-auto card shadow-2xl">
+    <div className="h-[80vh] flex flex-col items-center w-[70vw] mx-auto card shadow-2xl">
       <h2 className="font-[800] mt-6 mb-4 capitalize font-mono text-secondary text-2xl">
         Language that evokes Feelings:{" "}
         <span className="text-gray-800">ISL</span>
       </h2>
       <div className="card lg:card-side bg-base-100 shadow-xl w-full h-full flex">
-        <figure className="flex-1 flex justify-center items-center w-[100%] mx-auto ">
+        <figure className="flex-1 flex justify-center items-center mx-auto">
           <video
             ref={videoRef}
             className="w-full h-full object-cover"
@@ -188,19 +187,17 @@ const Prediction = () => {
           <canvas ref={canvasRef} style={{ display: "none" }} />
         </figure>
 
-        <div className="card-body flex-1 overflow-y-auto ">
+        <div className="card-body flex-1 overflow-y-auto">
           <div className="mt-5">
-            <div className="">
-              <h3 className="font-bold mb-2 font-mono">NMF Parameters:</h3>
-              <ul className="list-disc pl-6">
-                {ExtractedFeatures.map((feature, index) => (
-                  <li key={index} className="text-sm text-gray-700">
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <label className="form-control w-full max-w-xs">
+            <h3 className="font-bold mb-2 font-mono">NMF Parameters:</h3>
+            <ul className="list-disc pl-6">
+              {ExtractedFeatures.map((feature, index) => (
+                <li key={index} className="text-sm text-gray-700">
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <label className="form-control w-full max-w-xs mt-4">
               <input
                 type="text"
                 value={emotionDetected}
@@ -212,72 +209,39 @@ const Prediction = () => {
             <label className="form-control w-full max-w-xs mt-4">
               <input
                 type="text"
-                value={wordDetected}
+                value={Array.from(uniqueWords).join(" ")}
                 placeholder="ISL Sentence"
                 className="input input-bordered"
                 readOnly
               />
             </label>
           </div>
-          <div className="mt-6">
-            <label className="form-control w-full max-w-xs">
-              <span className="label-text font-bold">User Input:</span>
-              <input
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                placeholder="Enter a sentence for ISL translation"
-                className="input input-bordered"
-                disabled={inputsDisabled}
-              />
-            </label>
-            <button
-              className={`btn btn-primary mt-4 ${loading ? "loading" : ""}`}
-              onClick={sendPredictionRequest}
-              disabled={loading || inputsDisabled}
-            >
-              {loading ? "Processing..." : "Generate ISL Translation"}
-            </button>
-            {rewrittenSentence && (
-              <div className="mt-4">
-                <h3 className="font-bold">Rewritten Sentence:</h3>
-                <p className="text-gray-700">{rewrittenSentence}</p>
-              </div>
-            )}
-            {nonManualFeatures.length > 0 && (
-              <div className="mt-4">
-                <h3 className="font-bold">Non-Manual Features:</h3>
-                <ul className="list-disc pl-6">
-                  {nonManualFeatures.map((feature, index) => (
-                    <li key={index} className="text-sm text-gray-700">
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
           <div className="mt-6 flex gap-4">
             <button
               className={`btn ${
                 recording
-                  ? "btn btn-outline btn-primary"
-                  : "btn btn-outline btn-secondary"
+                  ? "btn-outline btn-primary"
+                  : "btn-outline btn-secondary"
               }`}
               onClick={recording ? stopRecording : startRecording}
             >
-              {recording ? (
-                <>
-                  <FaCircleStop className="mr-2" />
-                  Stop Recording
-                </>
-              ) : (
-                <>
-                  <BiVideoRecording className="mr-2" />
-                  Start Recording
-                </>
-              )}
+              {recording ? <FaCircleStop /> : <BiVideoRecording />}
+              {recording ? " Stop Recording" : " Start Recording"}
             </button>
+            {sending && (
+              <p className="text-gray-700">
+                <span className="loading loading-ring loading-md"></span>
+              </p>
+            )}
+            {!sending && rewrittenSentence && (
+              <div className="mt-4">
+                <h4 className="font-bold mt-20 mr-9 text-emerald-950">NMF Sentence:</h4>
+                <p className="text-gray-700">{rewrittenSentence}</p>
+              </div>
+            )}
+            {/* {sending === false && rewrittenSentence && (
+              <p className="text-gray-700">Received</p>
+            )} */}
           </div>
         </div>
       </div>

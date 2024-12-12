@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import google.generativeai as genai
-import os  # Import os to access environment variables
-from dotenv import load_dotenv  # Import dotenv to load .env file
+import os
+from dotenv import load_dotenv
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -35,29 +35,33 @@ def generate_emotion_text():
     if not sentence or not emotion:
         return jsonify({"error": "Both 'sentence' and 'emotion' fields are required."}), 400
 
-    # Generate content for the rewritten sentence
-    response_1 = model.generate_content(f"Rewrite the sentence: '{sentence}' in the detected emotion: {emotion}")
-    response_2 = model.generate_content(
-        "State and enlist the non-manual features detected like eye distances, eyebrow distance, mouth-to-nose distance, and so on."
-    )
+    try:
+        # Generate content for the rewritten sentence
+        response_1 = model.generate_content(f"Rewrite the sentence: '{sentence}' in the detected emotion: {emotion}")
+        response_2 = model.generate_content(
+            "State and enlist the non-manual features detected like eye distances, eyebrow distance, mouth-to-nose distance, and so on."
+        )
 
-    rewritten_sentence = response_1.text.strip()
+        rewritten_sentence = response_1.text.strip() if hasattr(response_1, 'text') else "Error generating sentence"
 
-    # Convert the markdown list into an array of features
-    non_manual_features_str = response_2.text.strip()
-    non_manual_features = []
-    
-    # Split the response based on lines starting with "*"
-    lines = non_manual_features_str.split("\n")
-    for line in lines:
-        if line.strip().startswith("*"):
-            feature = line.strip().replace("*", "").strip()
-            non_manual_features.append(feature)
+        # Convert the markdown list into an array of features
+        non_manual_features_str = response_2.text.strip() if hasattr(response_2, 'text') else ""
+        non_manual_features = []
+        
+        # Split the response based on lines starting with "*"
+        lines = non_manual_features_str.split("\n")
+        for line in lines:
+            if line.strip().startswith("*"):
+                feature = line.strip().replace("*", "").strip()
+                non_manual_features.append(feature)
 
-    return jsonify({
-        'rewritten_sentence': rewritten_sentence,
-        'non_manual_features': non_manual_features  # Send as an array
-    })
+        return jsonify({
+            'rewritten_sentence': rewritten_sentence,
+            'non_manual_features': non_manual_features  # Send as an array
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred while generating the content: {str(e)}"}), 500
 
 
 @ai_blueprint.route('/translate', methods=['POST'])
@@ -76,9 +80,13 @@ def translate_sentence():
     if not language:
         return jsonify({"error": "The 'language' field is required."}), 400
 
-    # Generate content for the translation of the last rewritten sentence
-    response_3 = model.generate_content(f"Translate this sentence: '{rewritten_sentence}' into {language}")
+    try:
+        # Generate content for the translation of the last rewritten sentence
+        response_3 = model.generate_content(f"Translate this sentence: '{rewritten_sentence}' into {language}")
 
-    return jsonify({
-        'translated_sentence': response_3.text.strip()
-    })
+        return jsonify({
+            'translated_sentence': response_3.text.strip() if hasattr(response_3, 'text') else "Error in translation"
+        })
+
+    except Exception as e:
+        return jsonify({"error": f"An error occurred while translating the sentence: {str(e)}"}), 500

@@ -3,12 +3,15 @@ from routes.ai_routes import ai_blueprint
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
+
 # Load environment variables from .env
 load_dotenv()
 
 # Get the host and port from the .env file
 host = os.getenv("FLASK_HOST", "127.0.0.1")
 port = int(os.getenv("FLASK_PORT_AI", 5201))  # Default port for the AI app is 5201
+
+# Initialize the Flask app
 app = Flask(__name__)
 CORS(app)
 
@@ -30,4 +33,5 @@ def home():
     })
 
 if __name__ == '__main__':
-    app.run(host=5102, port=port, debug=True)
+    # Fix: Set the host to "127.0.0.1" or "0.0.0.0", and use `port` from the env variable
+    app.run(host=host, port=port, debug=True)
