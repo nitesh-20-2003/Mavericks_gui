@@ -1,3 +1,4 @@
-node_modules/
+**/node_modules/
 # Ignore all .env files in the entire project
 *.env
+Sign-Kit-An-Avatar-based-ISL-Toolkit-main/client

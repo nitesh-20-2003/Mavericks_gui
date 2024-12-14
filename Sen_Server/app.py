@@ -13,6 +13,11 @@ from PIL import Image
 from threading import Lock
 import csv
 import time
+from dotenv import load_dotenv
+load_dotenv()
+ISL_HUGGING_FACE=os.getenv("ISL_HUGGING_FACE")
+if not ISL_HUGGING_FACE:
+    raise ValueError("Google API Key not found. Please set it in the .env file.")
 # Initialize Flask app and enable CORS
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
@@ -22,7 +27,7 @@ socketio = SocketIO(app, cors_allowed_origins="http://localhost:5173")
 
 # Load Hugging Face model
 print("Loading Hugging Face model...")
-model2=pipeline("image-classification", model="parasahuja23/vit-base-patch16-224-in21k-ISL-2.0_final_on_new_words")
+model2=pipeline("image-classification", model=ISL_HUGGING_FACE)
 print("Model loaded successfully!")
 
 # MediaPipe setup

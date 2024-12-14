@@ -171,13 +171,13 @@ const Prediction = () => {
   }, [socket5000, socket5103]);
 
   return (
-    <div className="h-[80vh] flex flex-col items-center w-[70vw] mx-auto card shadow-2xl">
+    <div className="h-[80vh] flex flex-col items-center w-[80vw] mx-auto card shadow-2xl">
       <h2 className="font-[800] mt-6 mb-4 capitalize font-mono text-secondary text-2xl">
         Language that evokes Feelings:{" "}
         <span className="text-gray-800">ISL</span>
       </h2>
       <div className="card lg:card-side bg-base-100 shadow-xl w-full h-full flex">
-        <figure className="flex-1 flex justify-center items-center mx-auto">
+        <figure className="flex-1 flex w-[100vw] mx-auto ">
           <video
             ref={videoRef}
             className="w-full h-full object-cover"
@@ -187,7 +187,7 @@ const Prediction = () => {
           <canvas ref={canvasRef} style={{ display: "none" }} />
         </figure>
 
-        <div className="card-body flex-1 overflow-y-auto">
+        <div className="card-body  items-end flex-1 overflow-y-auto">
           <div className="mt-5">
             <h3 className="font-bold mb-2 font-mono">NMF Parameters:</h3>
             <ul className="list-disc pl-6">
@@ -235,7 +235,7 @@ const Prediction = () => {
             )}
             {!sending && rewrittenSentence && (
               <div className="mt-4">
-                <h4 className="font-bold mt-20 mr-9 text-emerald-950">NMF Sentence:</h4>
+                <h4 className="font-bold mt-20 mr-9 text-emerald-950 font-mono">Generated Sentence: </h4>
                 <p className="text-gray-700">{rewrittenSentence}</p>
               </div>
             )}

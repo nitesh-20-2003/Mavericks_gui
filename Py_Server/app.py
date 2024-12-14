@@ -13,9 +13,15 @@ from PIL import Image
 from threading import Lock
 import csv
 import time
+from dotenv import load_dotenv
 
+# Load environment variables from the .env file
+load_dotenv()
 # Initialize Flask app and enable CORS
 app = Flask(__name__)
+HUGGING_FACE_MODEL=os.getenv("HUGGING_FACE_MODEL")
+if not HUGGING_FACE_MODEL:
+    raise ValueError("Google API Key not found. Please set it in the .env file.")
 CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
 
 # Initialize Flask-SocketIO
@@ -23,7 +29,7 @@ socketio = SocketIO(app, cors_allowed_origins="http://localhost:5173")
 
 # Load Hugging Face model
 print("Loading Hugging Face model...")
-model = pipeline("image-classification", model="parasahuja23/vit-base-patch16-224-in21k-finetuned-final-3.0")
+model = pipeline("image-classification", model=HUGGING_FACE_MODEL)
 # model2=pipeline("image-classification", model="parasahuja23/vit-base-patch16-224-in21k-ISL-2.0_final_on_new_words")
 # print("Model loaded successfully!")
 
@@ -43,7 +49,7 @@ CANVAS_HEIGHT = 1080
 CSV_FILE = "facial_features_log.csv"
 
 # Directory to save output frames
-OUTPUT_DIR = "output_frames"
+OUTPUT_DIR = "output"
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
@@ -52,6 +58,7 @@ def calculate_distance(point1, point2):
     return math.sqrt((point1[0] - point2[0])**2 + (point1[1] - point2[1])**2)
 
 def calculate_angle(point1, point2, point3):
+    
     a = calculate_distance(point2, point3)
     b = calculate_distance(point1, point3)
     c = calculate_distance(point1, point2)

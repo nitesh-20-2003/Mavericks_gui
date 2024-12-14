@@ -64,7 +64,7 @@ const links = [
     icon: <ImProfile />,
   },
   {
-    text:"Sign Interpreter",
+    text:"Sign Translator",
     path:"Sign",
     icon:<FaSortAlphaDown />,
   },
