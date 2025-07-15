@@ -22,7 +22,7 @@ const IslComponent = () => {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    const socketInstance = io("http://localhost:5000");
+    const socketInstance = io("http://localhost:5101");
     setSocket(socketInstance);
 
     return () => {

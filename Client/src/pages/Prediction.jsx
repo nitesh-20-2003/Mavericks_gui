@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 const Prediction = () => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const [socket5000, setSocket5000] = useState(null);
+  const [socket5101, setSocket5101] = useState(null);
   const [socket5103, setSocket5103] = useState(null);
   const [response, setResponse] = useState("Waiting for predictions...");
   const [ExtractedFeatures, setExtractedFeatures] = useState([]);
@@ -24,13 +24,13 @@ const Prediction = () => {
   const [sending, setSending] = useState(false); // New state for tracking sending process
 
   useEffect(() => {
-    const socketInstance5000 = io("http://localhost:5000");
+    const socketInstance5101 = io("http://localhost:5101");
     const socketInstance5103 = io("http://localhost:5103");
-    setSocket5000(socketInstance5000);
+    setSocket5101(socketInstance5101);
     setSocket5103(socketInstance5103);
 
     return () => {
-      socketInstance5000.disconnect();
+      socketInstance5101.disconnect();
       socketInstance5103.disconnect();
     };
   }, []);
@@ -89,7 +89,7 @@ const Prediction = () => {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64Image = reader.result;
-            socket5000?.emit("process_frame", base64Image);
+            socket5101?.emit("process_frame", base64Image);
             socket5103?.emit("process_frame", base64Image);
           };
           reader.readAsDataURL(blob);
@@ -144,7 +144,7 @@ const Prediction = () => {
   };
 
   useEffect(() => {
-    socket5000?.on("frame_processed", (data) => {
+    socket5101?.on("frame_processed", (data) => {
       if (data.face_analysis) {
         const faceAnalysisArray = Object.entries(data.face_analysis).map(
           ([key, value]) => `${key}: ${value}`
@@ -152,6 +152,7 @@ const Prediction = () => {
         setExtractedFeatures(faceAnalysisArray);
       }
       if (data.predictions) {
+        console.log(data.predictions.label);
         setEmotionDetected(data.predictions.label);
         setResponse(data.predictions.label);
       }
@@ -165,10 +166,10 @@ const Prediction = () => {
     });
 
     return () => {
-      socket5000?.off("frame_processed");
+      socket5101?.off("frame_processed");
       socket5103?.off("frame_processed");
     };
-  }, [socket5000, socket5103]);
+  }, [socket5101, socket5103]);
 
   return (
     <div className="h-[80vh] flex flex-col items-center w-[80vw] mx-auto card shadow-2xl">

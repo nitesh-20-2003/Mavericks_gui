@@ -9,7 +9,7 @@ load_dotenv()
 
 # Get the host and port from the .env file
 host = os.getenv("FLASK_HOST", "127.0.0.1")
-port = int(os.getenv("FLASK_PORT_AI", 5201))  # Default port for the AI app is 5201
+port = int(os.getenv("FLASK_PORT_AI", 5102))  # Default port for the AI app is 5201
 
 # Initialize the Flask app
 app = Flask(__name__)

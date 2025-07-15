@@ -25,7 +25,7 @@ const DataSet = () => {
   const [displayType, setDisplayType] = useState("emotion"); // 'emotion' or 'word'
 
   useEffect(() => {
-    const socketInstance = io("http://localhost:5000");
+    const socketInstance = io("http://localhost:5101");
     setSocket(socketInstance);
 
     return () => {
